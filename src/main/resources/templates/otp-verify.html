@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ConsultEase - OTP Verification</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+    <!-- PHINMA Header Logo (Top Right) -->
+    <div class="phinma-header-logo">
+        <i class="fa-solid fa-graduation-cap"></i>
+        <span>PHINMA EDUCATION</span>
+    </div>
+
+    <!-- White Card Container -->
+    <div class="white-card-container" style="max-width: 420px;">
+        
+        <!-- Yellow Circle Logo -->
+        <div class="logo-circle" style="text-align: center; margin-bottom: 10px;">
+            <img th:src="@{/images/logo.png}" alt="ConsultEase Logo" onerror="this.style.display='none'">
+        </div>
+
+        <p class="branding-sub">CONSULTEASE</p>
+        <h1 class="school-title" style="font-size: 20px; color: #111;">Saint Jude College</h1>
+        <p class="school-address" style="color: #666; margin-bottom: 15px;">Dimasalang cor. Don Quijote St., Sampaloc, Manila, 1008 Metro Manila</p>
+
+        <h2 class="form-title" style="font-size: 22px; margin-bottom: 10px;">Enter OTP</h2>
+        <p style="font-size: 12px; color: #555; text-align: center; margin-bottom: 20px;">
+            Check your email for the verification code.
+        </p>
+
+        <form th:action="@{/otp-verify}" method="post">
+            <div class="form-group" style="text-align: center;">
+                <label style="text-align: center; margin-bottom: 8px;">6-DIGIT CODE</label>
+                <input type="text" 
+                       name="otp" 
+                       class="form-control" 
+                       placeholder="0 0 0 0 0 0" 
+                       maxlength="6" 
+                       style="text-align: center; font-size: 18px; letter-spacing: 6px; font-weight: bold; width: 100%; max-width: 280px; margin: 0 auto; display: block;" 
+                       required>
+            </div>
+
+            <button type="submit" class="btn-green">Submit</button>
+        </form>
+
+        <a th:href="@{/register}" class="card-bottom-link">Back to Registration</a>
+    </div>
+
+</body>
+</html>

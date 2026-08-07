@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ConsultEase - Login</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+    <div class="phinma-header-logo">
+        <i class="fa-solid fa-graduation-cap"></i>
+        <span>PHINMA EDUCATION</span>
+    </div>
+
+    <div class="white-card-container" style="max-width: 400px; text-align: center;">
+        <div class="logo-container">
+            <img th:src="@{/images/logo.png}" alt="ConsultEase Logo">
+        </div>
+
+        <p class="branding-sub">CONSULTEASE</p>
+        <h1 class="school-title">Saint Jude College</h1>
+        <p class="school-address">Dimasalang cor. Don Quijote St., Sampaloc, Manila, 1008 Metro Manila</p>
+
+        <h2 class="form-title" style="margin-top: 10px;">Log In</h2>
+
+        <form th:action="@{/login}" method="post">
+            <div class="form-group">
+                <label style="text-align: left;">ID NUMBER</label>
+                <input type="text" name="username" class="form-control" placeholder="00-0000-000000" required>
+            </div>
+
+            <div class="form-group">
+                <label style="text-align: left;">PASSWORD</label>
+                <input type="password" name="password" class="form-control" placeholder="Enter password" required>
+            </div>
+
+            <a href="#" style="display: block; text-align: right; font-size: 11px; color: #0e382c; text-decoration: underline; margin-bottom: 15px;">Forgot your password?</a>
+
+            <button type="submit" class="btn-green" style="max-width: 100%;">Sign In</button>
+        </form>
+
+        <a th:href="@{/register}" class="card-bottom-link">Create Account</a>
+    </div>
+
+</body>
+</html>

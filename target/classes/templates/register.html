@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ConsultEase - Register Account</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+    <div class="phinma-header-logo">
+        <i class="fa-solid fa-graduation-cap"></i>
+        <span>PHINMA EDUCATION</span>
+    </div>
+
+    <div class="white-card-container">
+        <div class="logo-container">
+            <img th:src="@{/images/logo.png}" alt="ConsultEase Logo">
+        </div>
+
+        <p class="branding-sub">CONSULTEASE</p>
+        <h1 class="form-title">Create Account</h1>
+
+        <form th:action="@{/register}" method="post">
+
+            <!-- 🛑 ERROR MESSAGE DISPLAY -->
+            <div th:if="${errorMessage}" class="alert alert-danger" style="color: red; font-weight: bold; margin-bottom: 15px; text-align: center;">
+                <p th:text="${errorMessage}"></p>
+            </div>
+
+            <!-- SCHOOL EMAIL -->
+            <div class="form-group">
+                <label>SCHOOL EMAIL</label>
+                <input type="email" name="email" class="form-control" placeholder="name.surname.sjc@phinmaed.com" required>
+            </div>
+
+            <!-- NAMES ROW -->
+            <div class="form-row">
+                <div class="form-group">
+                    <label>FIRST NAME</label>
+                    <input type="text" name="firstName" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label>MIDDLE NAME (Optional)</label>
+                    <input type="text" name="middleName" class="form-control">
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>LAST NAME</label>
+                    <input type="text" name="lastName" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label>SUFFIX (Optional)</label>
+                    <select name="suffix" class="form-control">
+                        <option value="">-- None --</option>
+                        <option value="Jr.">Jr.</option>
+                        <option value="Sr.">Sr.</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- CAMPUS -->
+            <div class="form-group">
+                <label>CAMPUS</label>
+                <select name="campus" class="form-control">
+                    <option value="PHINMA Saint Jude College Manila">-- PHINMA Saint Jude College Manila --</option>
+                </select>
+            </div>
+
+            <!-- ID NUMBER -->
+            <div class="form-group">
+                <label for="idNumber">ID NUMBER</label>
+                <input type="text" 
+                       id="idNumber" 
+                       name="idNumber" 
+                       class="form-control" 
+                       placeholder="00-0000-000000" 
+                       maxlength="14" 
+                       required />
+            </div>
+
+            <!-- PASSWORDS SECTION -->
+            <div style="border-bottom: 1px solid #aaa; margin: 12px 0 8px 0;">
+                <p style="font-size: 10px; font-weight: 800; color: #333;">CREATE PASSWORD</p>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>PASSWORD</label>
+                    <input type="password" name="password" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label>CONFIRM PASSWORD</label>
+                    <input type="password" name="confirmPassword" class="form-control" required>
+                </div>
+            </div>
+
+            <button type="submit" class="btn-green">Verify</button>
+        </form>
+
+        <a th:href="@{/login}" class="card-bottom-link">Already have an account? Log In</a>
+    </div>
+
+    <!-- JS FILE FOR AUTO HYPHEN FORMATTING -->
+    <script th:src="@{/js/register.js}" src="/js/register.js"></script>
+</body>
+</html>
