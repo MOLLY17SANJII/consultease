@@ -4,51 +4,123 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ConsultEase - OTP Verification</title>
-    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-green: #0e3d29;
+            --accent-gold: #e2ab22;
+            --glass-bg: rgba(14, 40, 28, 0.88);
+            --card-border: rgba(255, 255, 255, 0.15);
+            --text-light: #ffffff;
+            --text-muted: #d1d5db;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: 
+                linear-gradient(135deg, rgba(14, 61, 41, 0.92) 0%, rgba(8, 35, 23, 0.95) 50%, rgba(196, 154, 43, 0.30) 100%),
+                url('/images/sjc-building.jpg') center/cover no-repeat fixed;
+            color: var(--text-light);
+        }
+
+        .top-brand-bar { position: absolute; top: 20px; right: 20px; display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 13px; }
+        .top-brand-bar i { font-size: 20px; color: var(--accent-gold); }
+
+        .otp-card {
+            background: var(--glass-bg); backdrop-filter: blur(16px);
+            padding: 40px 30px; border-radius: 20px; border: 1px solid var(--card-border);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.6); width: 100%; max-width: 440px; text-align: center;
+        }
+
+        /* 🌟 Circular Gold-Glow Badge Style for Logo */
+        .consult-logo-circle {
+            width: 80px;
+            height: 80px;
+            background-color: #ffffff;
+            border: 3.5px solid #f1b217;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px;
+            margin: 0 auto 12px auto;
+            box-shadow: 0 0 15px rgba(241, 178, 23, 0.6);
+        }
+
+        .consult-logo-circle img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        .otp-input {
+            width: 100%; padding: 14px; border-radius: 30px; border: 1px solid rgba(255,255,255,0.8);
+            font-size: 22px; text-align: center; letter-spacing: 8px; font-weight: 800; outline: none; margin: 20px 0;
+            color: #222;
+        }
+
+        .btn-submit {
+            background: linear-gradient(135deg, #f5c747 0%, var(--accent-gold) 100%);
+            color: var(--primary-green); font-weight: 800; border: none; width: 100%;
+            padding: 14px; border-radius: 30px; font-size: 16px; cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .btn-submit:hover { transform: translateY(-1px); }
+
+        #toast-container { position: fixed; top: 20px; right: 20px; z-index: 99999; display: flex; flex-direction: column; gap: 12px; }
+        .toast-msg { min-width: 280px; padding: 14px 18px; border-radius: 12px; color: #ffffff; font-size: 13.5px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 10px 25px rgba(0,0,0,0.45); }
+        .toast-msg.error { background: rgba(200, 35, 51, 0.95); }
+    </style>
 </head>
 <body>
 
-    <!-- PHINMA Header Logo (Top Right) -->
-    <div class="phinma-header-logo">
+    <div class="top-brand-bar">
         <i class="fa-solid fa-graduation-cap"></i>
         <span>PHINMA EDUCATION</span>
     </div>
 
-    <!-- White Card Container -->
-    <div class="white-card-container" style="max-width: 420px;">
-        
-        <!-- Yellow Circle Logo -->
-        <div class="logo-circle" style="text-align: center; margin-bottom: 10px;">
-            <img th:src="@{/images/logo.png}" alt="ConsultEase Logo" onerror="this.style.display='none'">
+    <div id="toast-container"></div>
+
+    <div class="otp-card">
+        <!-- Logo Wrapper with White Circle & Gold Glow -->
+        <div class="consult-logo-circle">
+            <img th:src="@{/images/logo.png}" src="/images/logo.png" alt="ConsultEase Logo">
         </div>
 
-        <p class="branding-sub">CONSULTEASE</p>
-        <h1 class="school-title" style="font-size: 20px; color: #111;">Saint Jude College</h1>
-        <p class="school-address" style="color: #666; margin-bottom: 15px;">Dimasalang cor. Don Quijote St., Sampaloc, Manila, 1008 Metro Manila</p>
-
-        <h2 class="form-title" style="font-size: 22px; margin-bottom: 10px;">Enter OTP</h2>
-        <p style="font-size: 12px; color: #555; text-align: center; margin-bottom: 20px;">
-            Check your email for the verification code.
-        </p>
+        <h2>Verify OTP</h2>
+        <p style="font-size: 12px; color: var(--text-muted);">An OTP code was sent to your school email.</p>
 
         <form th:action="@{/otp-verify}" method="post">
-            <div class="form-group" style="text-align: center;">
-                <label style="text-align: center; margin-bottom: 8px;">6-DIGIT CODE</label>
-                <input type="text" 
-                       name="otp" 
-                       class="form-control" 
-                       placeholder="0 0 0 0 0 0" 
-                       maxlength="6" 
-                       style="text-align: center; font-size: 18px; letter-spacing: 6px; font-weight: bold; width: 100%; max-width: 280px; margin: 0 auto; display: block;" 
-                       required>
-            </div>
-
-            <button type="submit" class="btn-green">Submit</button>
+            <input type="text" name="otp" class="otp-input" placeholder="••••••" maxlength="6" required autocomplete="off">
+            <button type="submit" class="btn-submit">VERIFY & COMPLETE</button>
         </form>
-
-        <a th:href="@{/register}" class="card-bottom-link">Back to Registration</a>
     </div>
 
+    <script th:inline="javascript">
+        function showToast(message) {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = 'toast-msg error';
+            toast.innerHTML = `
+                <div style="display:flex;align-items:center;gap:10px;">
+                    <i class="fa-solid fa-circle-exclamation"></i>
+                    <span>${message}</span>
+                </div>
+                <i class="fa-solid fa-xmark" style="cursor:pointer" onclick="this.parentElement.remove()"></i>
+            `;
+            container.appendChild(toast);
+            setTimeout(() => { if (toast) toast.remove(); }, 5000);
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const errorMessage = /*[[${errorMessage}]]*/ null;
+            if (errorMessage) showToast(errorMessage);
+        });
+    </script>
 </body>
 </html>

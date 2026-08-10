@@ -3,46 +3,181 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ConsultEase - Login</title>
-    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <title>ConsultEase - Log In</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-green: #0e3d29;
+            --dark-green: #082317;
+            --accent-gold: #e2ab22;
+            --accent-hover: #c99618;
+            --glass-bg: rgba(14, 40, 28, 0.88);
+            --card-border: rgba(255, 255, 255, 0.15);
+            --text-light: #ffffff;
+            --text-muted: #d1d5db;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            padding: 20px 15px;
+            background: 
+                linear-gradient(135deg, rgba(14, 61, 41, 0.92) 0%, rgba(8, 35, 23, 0.95) 50%, rgba(196, 154, 43, 0.30) 100%),
+                url('/images/sjc-building.jpg') center/cover no-repeat fixed;
+            overflow-x: hidden;
+            color: var(--text-light);
+        }
+
+        .top-brand-bar {
+            position: absolute; top: 20px; right: 20px; display: flex; align-items: center;
+            gap: 8px; color: var(--text-light); font-weight: 700; letter-spacing: 1px; font-size: 13px;
+        }
+        .top-brand-bar i { font-size: 20px; color: var(--accent-gold); }
+
+        .login-card {
+            background: var(--glass-bg); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+            padding: 40px 30px; border-radius: 20px; border: 1px solid var(--card-border);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6); width: 100%; max-width: 440px; text-align: center; color: var(--text-light);
+        }
+
+        /* 🌟 Circular Gold-Glow Badge Style for Logo */
+        .consult-logo-circle {
+            width: 80px;
+            height: 80px;
+            background-color: #ffffff;
+            border: 3.5px solid #f1b217;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px;
+            margin: 0 auto 12px auto;
+            box-shadow: 0 0 15px rgba(241, 178, 23, 0.6);
+        }
+
+        .consult-logo-circle img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        .brand-title { font-size: 11px; font-weight: 800; letter-spacing: 2px; color: var(--accent-gold); text-transform: uppercase; margin-bottom: 2px; }
+        .login-card h2 { margin: 0 0 4px 0; font-size: 26px; font-weight: 700; }
+        .subtitle { font-size: 12px; color: var(--text-muted); margin-bottom: 25px; line-height: 1.4; }
+
+        .input-group-custom { margin-bottom: 18px; text-align: left; }
+        .input-group-custom label {
+            font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase;
+            letter-spacing: 0.5px; display: block; margin-bottom: 6px; padding-left: 4px;
+        }
+
+        .input-wrapper { position: relative; }
+        .input-group-custom input {
+            width: 100%; padding: 12px 16px; border: 1px solid rgba(255, 255, 255, 0.8);
+            border-radius: 30px; font-size: 13.5px; outline: none; background: #ffffff; color: #222222;
+        }
+
+        .toggle-password { position: absolute; right: 16px; top: 50%; transform: translateY(-50%); color: #666; cursor: pointer; font-size: 15px; z-index: 2; }
+
+        .btn-login {
+            background: linear-gradient(135deg, #f5c747 0%, var(--accent-gold) 100%);
+            color: var(--primary-green); font-weight: 800; border: none; width: 100%;
+            padding: 14px; border-radius: 30px; cursor: pointer; font-size: 16px; margin-top: 10px;
+        }
+
+        .links { margin-top: 22px; font-size: 13.5px; }
+        .links a { color: var(--text-light); font-weight: 600; text-decoration: underline; }
+
+        #toast-container { position: fixed; top: 20px; right: 20px; z-index: 99999; display: flex; flex-direction: column; gap: 12px; }
+        .toast-msg { min-width: 280px; padding: 14px 18px; border-radius: 12px; color: #ffffff; font-size: 13.5px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 10px 25px rgba(0,0,0,0.45); }
+        .toast-msg.error { background: rgba(180, 40, 50, 0.92); }
+        .toast-msg.success { background: rgba(20, 120, 60, 0.92); }
+    </style>
 </head>
 <body>
 
-    <div class="phinma-header-logo">
+    <div class="top-brand-bar">
         <i class="fa-solid fa-graduation-cap"></i>
         <span>PHINMA EDUCATION</span>
     </div>
 
-    <div class="white-card-container" style="max-width: 400px; text-align: center;">
-        <div class="logo-container">
-            <img th:src="@{/images/logo.png}" alt="ConsultEase Logo">
+    <div id="toast-container"></div>
+
+    <div class="login-card">
+        <!-- Logo Wrapper with White Circle & Gold Glow -->
+        <div class="consult-logo-circle">
+            <img th:src="@{/images/logo.png}" src="/images/logo.png" alt="ConsultEase Logo">
         </div>
-
-        <p class="branding-sub">CONSULTEASE</p>
-        <h1 class="school-title">Saint Jude College</h1>
-        <p class="school-address">Dimasalang cor. Don Quijote St., Sampaloc, Manila, 1008 Metro Manila</p>
-
-        <h2 class="form-title" style="margin-top: 10px;">Log In</h2>
+        
+        <div class="brand-title">ConsultEase</div>
+        <h2>Welcome Back</h2>
+        <div class="subtitle">Sign in to manage your faculty consultations</div>
 
         <form th:action="@{/login}" method="post">
-            <div class="form-group">
-                <label style="text-align: left;">ID NUMBER</label>
-                <input type="text" name="username" class="form-control" placeholder="00-0000-000000" required>
+            <div class="input-group-custom">
+                <label>School Email</label>
+                <input type="email" name="email" required placeholder="name.surname.sjc@phinmaed.com" autocomplete="off">
             </div>
 
-            <div class="form-group">
-                <label style="text-align: left;">PASSWORD</label>
-                <input type="password" name="password" class="form-control" placeholder="Enter password" required>
+            <div class="input-group-custom">
+                <label>Password</label>
+                <div class="input-wrapper">
+                    <input type="password" id="loginPassword" name="password" required placeholder="••••••••">
+                    <i class="fa-solid fa-eye toggle-password" id="toggleLoginPass" onclick="togglePass('loginPassword', 'toggleLoginPass')"></i>
+                </div>
             </div>
 
-            <a href="#" style="display: block; text-align: right; font-size: 11px; color: #0e382c; text-decoration: underline; margin-bottom: 15px;">Forgot your password?</a>
-
-            <button type="submit" class="btn-green" style="max-width: 100%;">Sign In</button>
+            <button type="submit" class="btn-login">Log In</button>
         </form>
 
-        <a th:href="@{/register}" class="card-bottom-link">Create Account</a>
+        <div class="links">
+            Don't have an account? <a th:href="@{/register}">Register Here</a>
+        </div>
     </div>
 
+    <script th:inline="javascript">
+        function showToast(message, type = 'error') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast-msg ${type}`;
+            const icon = type === 'error' ? 'fa-circle-exclamation' : 'fa-circle-check';
+            toast.innerHTML = `
+                <div style="display:flex;align-items:center;gap:10px;">
+                    <i class="fa-solid ${icon}"></i>
+                    <span>${message}</span>
+                </div>
+                <i class="fa-solid fa-xmark" style="cursor:pointer" onclick="this.parentElement.remove()"></i>
+            `;
+            container.appendChild(toast);
+            setTimeout(() => { if (toast && toast.parentElement) toast.remove(); }, 5000);
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.has('registered')) {
+                showToast('Account verified! You can now log in.', 'success');
+            }
+            if (urlParams.has('error')) {
+                showToast('Invalid school email or password.', 'error');
+            }
+        });
+
+        function togglePass(inputId, iconId) {
+            const field = document.getElementById(inputId);
+            const icon = document.getElementById(iconId);
+            if (field.type === "password") {
+                field.type = "text"; icon.classList.replace("fa-eye", "fa-eye-slash");
+            } else {
+                field.type = "password"; icon.classList.replace("fa-eye-slash", "fa-eye");
+            }
+        }
+    </script>
 </body>
 </html>

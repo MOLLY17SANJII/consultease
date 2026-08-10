@@ -1,5 +1,7 @@
 package com.consultease.app.model;
 
+import java.time.LocalDateTime;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -7,96 +9,125 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "users")
 public class User {
 
+    public enum Role {
+        STUDENT,
+        FACULTY,
+        ADMIN
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "user_id")
     private Long id;
-
-    @Column(name = "full_name", nullable = false)
-    private String fullName;
 
     @Column(nullable = false, unique = true)
     private String email;
 
-    @Column(name = "password_hash", nullable = false)
+    private String firstName;
+    private String middleName;
+    private String lastName;
+    private String suffix;
+    private String fullName;
+
+    private String campus; 
+    private String course;       
+    private String department;   
+    
+    @Column(unique = true)
+    private String idNumber;
+    
     private String password;
+    
+    // 👈 BAGONG ADDED FIELD: Para sa Profile Picture Path
+    private String profilePicture;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private Role role;
+    private Role role; 
+    
+    private String otpCode;
+    private Boolean isVerified = false;
 
-    @Column(name = "contact_number")
-    private String contactNumber;
+    @Column(updatable = false)
+    private LocalDateTime createdAt;
 
-    public enum Role {
-        STUDENT, FACULTY, OFFICE, ADMIN
+    public User() {}
+
+    @PrePersist
+    protected void onCreate() {
+        if (this.createdAt == null) {
+            this.createdAt = LocalDateTime.now();
+        }
     }
 
-    // Default Constructor
-    public User() {
+    public String getFormattedFullName() {
+        if (fullName != null && !fullName.isBlank()) {
+            return fullName;
+        }
+        StringBuilder sb = new StringBuilder();
+        if (firstName != null) sb.append(firstName).append(" ");
+        if (middleName != null && !middleName.isBlank()) sb.append(middleName).append(" ");
+        if (lastName != null) sb.append(lastName);
+        if (suffix != null && !suffix.isBlank()) sb.append(" ").append(suffix);
+        return sb.toString().trim();
     }
 
-    // Parameterized Constructor
-    public User(String fullName, String email, String password, Role role, String contactNumber) {
-        this.fullName = fullName;
-        this.email = email;
-        this.password = password;
-        this.role = role;
-        this.contactNumber = contactNumber;
-    }
+    // --- GETTERS AND SETTERS ---
 
-    // Getters and Setters
-    public Long getId() {
-        return id;
-    }
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+    public String getEmail() { return email; }
+    public void setEmail(String email) { this.email = email; }
 
-    public String getFullName() {
-        return fullName;
-    }
+    public String getFirstName() { return firstName; }
+    public void setFirstName(String firstName) { this.firstName = firstName; }
 
-    public void setFullName(String fullName) {
-        this.fullName = fullName;
-    }
+    public String getMiddleName() { return middleName; }
+    public void setMiddleName(String middleName) { this.middleName = middleName; }
 
-    public String getEmail() {
-        return email;
-    }
+    public String getLastName() { return lastName; }
+    public void setLastName(String lastName) { this.lastName = lastName; }
 
-    public void setEmail(String email) {
-        this.email = email;
-    }
+    public String getSuffix() { return suffix; }
+    public void setSuffix(String suffix) { this.suffix = suffix; }
 
-    public String getPassword() {
-        return password;
-    }
+    public String getFullName() { return fullName; }
+    public void setFullName(String fullName) { this.fullName = fullName; }
 
-    public void setPassword(String password) {
-        this.password = password;
-    }
+    public String getCampus() { return campus; }
+    public void setCampus(String campus) { this.campus = campus; }
 
-    public Role getRole() {
-        return role;
-    }
+    public String getCourse() { return course; }
+    public void setCourse(String course) { this.course = course; }
 
-    public void setRole(Role role) {
-        this.role = role;
-    }
+    public String getDepartment() { return department; }
+    public void setDepartment(String department) { this.department = department; }
 
-    public String getContactNumber() {
-        return contactNumber;
-    }
+    public String getIdNumber() { return idNumber; }
+    public void setIdNumber(String idNumber) { this.idNumber = idNumber; }
 
-    public void setContactNumber(String contactNumber) {
-        this.contactNumber = contactNumber;
-    }
+    public String getPassword() { return password; }
+    public void setPassword(String password) { this.password = password; }
+
+    // 👈 GETTER AT SETTER PARA SA PROFILE PICTURE
+    public String getProfilePicture() { return profilePicture; }
+    public void setProfilePicture(String profilePicture) { this.profilePicture = profilePicture; }
+
+    public Role getRole() { return role; }
+    public void setRole(Role role) { this.role = role; }
+
+    public String getOtpCode() { return otpCode; }
+    public void setOtpCode(String otpCode) { this.otpCode = otpCode; }
+
+    public Boolean getIsVerified() { return isVerified; }
+    public void setIsVerified(Boolean isVerified) { this.isVerified = isVerified; }
+
+    public LocalDateTime getCreatedAt() { return createdAt; }
+    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
 }

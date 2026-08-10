@@ -3,108 +3,317 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ConsultEase - Register Account</title>
-    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <title>ConsultEase - Create Account</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-green: #0e3d29;
+            --dark-green: #082317;
+            --accent-gold: #e2ab22;
+            --accent-hover: #c99618;
+            --glass-bg: rgba(14, 40, 28, 0.88);
+            --card-border: rgba(255, 255, 255, 0.15);
+            --text-light: #ffffff;
+            --text-muted: #d1d5db;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            padding: 50px 15px;
+            background: 
+                linear-gradient(135deg, rgba(14, 61, 41, 0.92) 0%, rgba(8, 35, 23, 0.95) 50%, rgba(196, 154, 43, 0.30) 100%),
+                url('/images/sjc-building.jpg') center/cover no-repeat fixed;
+            overflow-x: hidden;
+            color: var(--text-light);
+        }
+
+        .top-brand-bar {
+            position: absolute; top: 20px; right: 20px; display: flex; align-items: center;
+            gap: 8px; color: var(--text-light); font-weight: 700; letter-spacing: 1px; font-size: 13px;
+        }
+        .top-brand-bar i { font-size: 20px; color: var(--accent-gold); }
+
+        .register-card {
+            background: var(--glass-bg); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+            padding: 35px 30px; border-radius: 20px; border: 1px solid var(--card-border);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6); width: 100%; max-width: 500px; text-align: center; color: var(--text-light);
+        }
+
+        /* 🌟 Circular Gold-Glow Badge Style for Logo */
+        .consult-logo-circle {
+            width: 75px;
+            height: 75px;
+            background-color: #ffffff;
+            border: 3.5px solid #f1b217;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 9px;
+            margin: 0 auto 10px auto;
+            box-shadow: 0 0 15px rgba(241, 178, 23, 0.6);
+        }
+
+        .consult-logo-circle img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        .brand-title { font-size: 11px; font-weight: 800; letter-spacing: 2px; color: var(--accent-gold); text-transform: uppercase; margin-bottom: 2px; }
+        .register-card h2 { margin: 0 0 20px 0; font-size: 24px; font-weight: 700; }
+
+        .form-row-flex { display: flex; gap: 12px; }
+        @media (max-width: 576px) { .form-row-flex { flex-direction: column; gap: 0; } }
+
+        .input-group-custom { margin-bottom: 14px; text-align: left; flex: 1; }
+        .input-group-custom label { font-size: 10.5px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 5px; padding-left: 2px; }
+        
+        .section-header-label {
+            font-size: 11px; font-weight: 800; color: var(--accent-gold); text-transform: uppercase;
+            letter-spacing: 1px; text-align: left; margin: 15px 0 8px 2px; border-bottom: 1px solid rgba(226, 171, 34, 0.3); padding-bottom: 4px;
+        }
+
+        .input-wrapper { position: relative; width: 100%; }
+        .input-group-custom input, .input-group-custom select {
+            width: 100%; padding: 11px 42px 11px 16px; border: 1px solid rgba(255, 255, 255, 0.8);
+            border-radius: 30px; font-size: 13px; outline: none; background: #ffffff; color: #222222;
+        }
+
+        .input-group-custom select {
+            appearance: none; -webkit-appearance: none;
+            background-image: url("data:image/svg+xml;utf8,<svg fill='%230e3d29' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/></svg>");
+            background-repeat: no-repeat; background-position: right 14px center; background-size: 18px; padding-right: 38px;
+        }
+
+        /* Eye Icon Styling */
+        .toggle-password {
+            position: absolute; right: 15px; top: 50%; transform: translateY(-50%);
+            color: #555555; cursor: pointer; font-size: 15px; z-index: 10;
+            user-select: none; transition: color 0.2s;
+        }
+        .toggle-password:hover { color: var(--primary-green); }
+
+        .btn-verify {
+            background: linear-gradient(135deg, #f5c747 0%, var(--accent-gold) 100%);
+            color: var(--primary-green); font-weight: 800; border: none; width: 100%;
+            padding: 13px; border-radius: 30px; cursor: pointer; font-size: 16px; margin-top: 15px;
+            box-shadow: 0 4px 15px rgba(226, 171, 34, 0.3); transition: transform 0.2s;
+        }
+        .btn-verify:hover { transform: translateY(-1px); }
+
+        .links { margin-top: 18px; font-size: 13px; }
+        .links a { color: var(--text-light); font-weight: 600; text-decoration: underline; }
+
+        /* Toast Container */
+        #toast-container { position: fixed; top: 20px; right: 20px; z-index: 99999; display: flex; flex-direction: column; gap: 12px; }
+        .toast-msg { min-width: 300px; padding: 14px 18px; border-radius: 12px; color: #ffffff; font-size: 13.5px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 10px 25px rgba(0,0,0,0.45); animation: fadeIn 0.3s forwards; }
+        .toast-msg.error { background: rgba(200, 35, 51, 0.95); border-left: 5px solid #ff4d4d; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
 </head>
 <body>
 
-    <div class="phinma-header-logo">
+    <div class="top-brand-bar">
         <i class="fa-solid fa-graduation-cap"></i>
         <span>PHINMA EDUCATION</span>
     </div>
 
-    <div class="white-card-container">
-        <div class="logo-container">
-            <img th:src="@{/images/logo.png}" alt="ConsultEase Logo">
+    <div id="toast-container"></div>
+
+    <div class="register-card">
+        <!-- Logo Wrapper with White Circle & Gold Glow -->
+        <div class="consult-logo-circle">
+            <img th:src="@{/images/logo.png}" src="/images/logo.png" alt="ConsultEase Logo">
         </div>
 
-        <p class="branding-sub">CONSULTEASE</p>
-        <h1 class="form-title">Create Account</h1>
-
-        <form th:action="@{/register}" method="post">
-
-            <!-- 🛑 ERROR MESSAGE DISPLAY -->
-            <div th:if="${errorMessage}" class="alert alert-danger" style="color: red; font-weight: bold; margin-bottom: 15px; text-align: center;">
-                <p th:text="${errorMessage}"></p>
+        <div class="brand-title">ConsultEase</div>
+        <h2>Create Account</h2>
+        
+        <form th:action="@{/register}" method="post" onsubmit="return validateForm()">
+            
+            <div class="input-group-custom">
+                <label>School Email</label>
+                <input type="email" name="email" required placeholder="name.surname.sjc@phinmaed.com" autocomplete="off">
             </div>
 
-            <!-- SCHOOL EMAIL -->
-            <div class="form-group">
-                <label>SCHOOL EMAIL</label>
-                <input type="email" name="email" class="form-control" placeholder="name.surname.sjc@phinmaed.com" required>
-            </div>
-
-            <!-- NAMES ROW -->
-            <div class="form-row">
-                <div class="form-group">
-                    <label>FIRST NAME</label>
-                    <input type="text" name="firstName" class="form-control" required>
+            <div class="form-row-flex">
+                <div class="input-group-custom">
+                    <label>First Name</label>
+                    <input type="text" name="firstName" required autocomplete="off">
                 </div>
-                <div class="form-group">
-                    <label>MIDDLE NAME (Optional)</label>
-                    <input type="text" name="middleName" class="form-control">
+                <div class="input-group-custom">
+                    <label>Middle Name (Optional)</label>
+                    <input type="text" name="middleName" autocomplete="off">
                 </div>
             </div>
 
-            <div class="form-row">
-                <div class="form-group">
-                    <label>LAST NAME</label>
-                    <input type="text" name="lastName" class="form-control" required>
+            <div class="form-row-flex">
+                <div class="input-group-custom">
+                    <label>Last Name</label>
+                    <input type="text" name="lastName" required autocomplete="off">
                 </div>
-                <div class="form-group">
-                    <label>SUFFIX (Optional)</label>
-                    <select name="suffix" class="form-control">
+                <div class="input-group-custom">
+                    <label>Suffix (Optional)</label>
+                    <select name="suffix">
                         <option value="">-- None --</option>
                         <option value="Jr.">Jr.</option>
                         <option value="Sr.">Sr.</option>
+                        <option value="III">III</option>
                     </select>
                 </div>
             </div>
 
-            <!-- CAMPUS -->
-            <div class="form-group">
-                <label>CAMPUS</label>
-                <select name="campus" class="form-control">
+            <div class="input-group-custom">
+                <label>Campus</label>
+                <select name="campus">
                     <option value="PHINMA Saint Jude College Manila">-- PHINMA Saint Jude College Manila --</option>
                 </select>
             </div>
 
-            <!-- ID NUMBER -->
-            <div class="form-group">
-                <label for="idNumber">ID NUMBER</label>
-                <input type="text" 
-                       id="idNumber" 
-                       name="idNumber" 
-                       class="form-control" 
-                       placeholder="00-0000-000000" 
-                       maxlength="14" 
-                       required />
+            <div class="input-group-custom">
+                <label>Course</label>
+                <select name="course" required>
+                    <option value="" disabled selected>-- Select Your Course --</option>
+                    
+                    <optgroup label="Information Technology">
+                        <option value="BSIT">BSIT - Bachelor of Science in Information Technology</option>
+                        <option value="BSCS">BSCS - Bachelor of Science in Computer Science</option>
+                        <option value="ACT">ACT - Associate in Computer Technology</option>
+                    </optgroup>
+
+                    <optgroup label="Nursing & Allied Health">
+                        <option value="BSN">BSN - Bachelor of Science in Nursing</option>
+                        <option value="BSMLS">BSMLS - Bachelor of Science in Medical Laboratory Science</option>
+                        <option value="BSPHARM">BSPHARM - Bachelor of Science in Pharmacy</option>
+                        <option value="BSRT">BSRT - Bachelor of Science in Radiologic Technology</option>
+                        <option value="BSPT">BSPT - Bachelor of Science in Physical Therapy</option>
+                    </optgroup>
+
+                    <optgroup label="Criminology">
+                        <option value="BSCRIM">BSCRIM - Bachelor of Science in Criminology</option>
+                    </optgroup>
+
+                    <optgroup label="Management, Hospitality & Accountancy">
+                        <option value="BSBA">BSBA - Bachelor of Science in Business Administration</option>
+                        <option value="BSA">BSA - Bachelor of Science in Accountancy</option>
+                        <option value="BSMA">BSMA - Bachelor of Science in Management Accounting</option>
+                        <option value="BSHM">BSHM - Bachelor of Science in Hospitality Management</option>
+                        <option value="BSTM">BSTM - Bachelor of Science in Tourism Management</option>
+                    </optgroup>
+
+                    <optgroup label="Education">
+                        <option value="BSED">BSED - Bachelor of Secondary Education</option>
+                        <option value="BEED">BEED - Bachelor of Elementary Education</option>
+                        <option value="BSNED">BSNED - Bachelor of Special Needs Education</option>
+                    </optgroup>
+
+                    <optgroup label="Arts & Sciences">
+                        <option value="BSPSYCH">BSPSYCH - Bachelor of Science in Psychology</option>
+                        <option value="BACOMM">BACOMM - Bachelor of Arts in Communication</option>
+                        <option value="BAPOLSCI">BAPOLSCI - Bachelor of Arts in Political Science</option>
+                    </optgroup>
+
+                    <optgroup label="Engineering & Architecture">
+                        <option value="BSCE">BSCE - Bachelor of Science in Civil Engineering</option>
+                        <option value="BSEE">BSEE - Bachelor of Science in Electrical Engineering</option>
+                        <option value="BSME">BSME - Bachelor of Science in Mechanical Engineering</option>
+                        <option value="BSCPE">BSCPE - Bachelor of Science in Computer Engineering</option>
+                        <option value="BSARCH">BSARCH - Bachelor of Science in Architecture</option>
+                    </optgroup>
+                </select>
             </div>
 
-            <!-- PASSWORDS SECTION -->
-            <div style="border-bottom: 1px solid #aaa; margin: 12px 0 8px 0;">
-                <p style="font-size: 10px; font-weight: 800; color: #333;">CREATE PASSWORD</p>
+            <div class="input-group-custom">
+                <label>ID Number</label>
+                <input type="text" id="idNumber" name="idNumber" required placeholder="00-0000-000000" maxlength="14" autocomplete="off">
             </div>
 
-            <div class="form-row">
-                <div class="form-group">
-                    <label>PASSWORD</label>
-                    <input type="password" name="password" class="form-control" required>
+            <div class="section-header-label">Create Password</div>
+
+            <div class="form-row-flex">
+                <div class="input-group-custom">
+                    <label>Password</label>
+                    <div class="input-wrapper">
+                        <input type="password" id="regPassword" name="password" required>
+                        <i class="fa-solid fa-eye toggle-password" id="toggleRegPass" onclick="togglePass('regPassword', 'toggleRegPass')"></i>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label>CONFIRM PASSWORD</label>
-                    <input type="password" name="confirmPassword" class="form-control" required>
+                <div class="input-group-custom">
+                    <label>Confirm Password</label>
+                    <div class="input-wrapper">
+                        <input type="password" id="confirmPassword" name="confirmPassword" required>
+                        <i class="fa-solid fa-eye toggle-password" id="toggleConfirmPass" onclick="togglePass('confirmPassword', 'toggleConfirmPass')"></i>
+                    </div>
                 </div>
             </div>
 
-            <button type="submit" class="btn-green">Verify</button>
+            <button type="submit" class="btn-verify">Verify</button>
         </form>
 
-        <a th:href="@{/login}" class="card-bottom-link">Already have an account? Log In</a>
+        <div class="links">
+            <a th:href="@{/login}">Already have an account? Log In</a>
+        </div>
     </div>
 
-    <!-- JS FILE FOR AUTO HYPHEN FORMATTING -->
-    <script th:src="@{/js/register.js}" src="/js/register.js"></script>
+    <script th:inline="javascript">
+        function showToast(message, type = 'error') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast-msg ${type}`;
+            const icon = 'fa-circle-exclamation';
+            toast.innerHTML = `
+                <div style="display:flex;align-items:center;gap:10px;">
+                    <i class="fa-solid ${icon}"></i>
+                    <span>${message}</span>
+                </div>
+                <i class="fa-solid fa-xmark" style="cursor:pointer" onclick="this.parentElement.remove()"></i>
+            `;
+            container.appendChild(toast);
+            setTimeout(() => { if (toast && toast.parentElement) toast.remove(); }, 5000);
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const errorMessage = /*[[${errorMessage}]]*/ null;
+            if (errorMessage) {
+                showToast(errorMessage, 'error');
+            }
+        });
+
+        function togglePass(inputId, iconId) {
+            const inputField = document.getElementById(inputId);
+            const icon = document.getElementById(iconId);
+            
+            if (inputField.type === "password") {
+                inputField.type = "text";
+                icon.classList.remove("fa-eye");
+                icon.classList.add("fa-eye-slash");
+            } else {
+                inputField.type = "password";
+                icon.classList.remove("fa-eye-slash");
+                icon.classList.add("fa-eye");
+            }
+        }
+
+        function validateForm() {
+            const pass = document.getElementById("regPassword").value;
+            const confirmPass = document.getElementById("confirmPassword").value;
+            
+            if (pass !== confirmPass) {
+                showToast('Passwords do not match! Please check again.', 'error');
+                return false;
+            }
+            return true;
+        }
+    </script>
 </body>
 </html>
