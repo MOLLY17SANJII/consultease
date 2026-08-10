@@ -1,0 +1,177 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* PERMANENT BACKGROUND WITH GRADUATION/BUILDING IMAGE + GRADIENT OVERLAY */
+body {
+    min-height: 100vh;
+    background: linear-gradient(rgba(14, 56, 44, 0.85), rgba(184, 134, 11, 0.80)), 
+                url('../images/sjc-building.jpg') no-repeat center center/cover fixed;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    color: white;
+}
+
+/* PHINMA Header Logo (Top Right) */
+.phinma-header-logo {
+    position: absolute;
+    top: 25px;
+    right: 40px;
+    color: white;
+    font-weight: bold;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    letter-spacing: 1px;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+
+/* 🌟 Gold-Bordered White Circle Logo with Zoom & Glow Fix */
+.consult-logo-circle {
+    width: 85px;
+    height: 85px;
+    background-color: #ffffff;
+    border: 3.5px solid #f1b217;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;                             /* Tinanggal ang padding para magamit ang buong bilog */
+    margin: 0 auto 12px auto;
+    box-shadow: 0 0 15px rgba(241, 178, 23, 0.6); /* Gold glow effect */
+    overflow: hidden;                       /* Sinisiguradong bilog pa rin kahit i-zoom */
+}
+
+.consult-logo-circle img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    transform: scale(2.2);                 /* 🔍 Ino-zoom in ang logo para sumakto sa bilog */
+}
+
+/* Shared White Card Container (Login, Register & OTP) */
+.white-card-container {
+    background: rgba(255, 255, 255, 0.96);
+    backdrop-filter: blur(5px);
+    border-radius: 20px;
+    padding: 30px 35px;
+    width: 100%;
+    max-width: 440px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+    color: #222;
+    margin: auto;
+}
+
+/* Typography Styles Inside White Cards */
+.branding-sub {
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    text-align: center;
+    color: #555;
+}
+
+.school-title {
+    font-size: 22px;
+    font-weight: 800;
+    text-align: center;
+    margin-top: 2px;
+    color: #0e382c;
+}
+
+.school-address {
+    font-size: 10px;
+    text-align: center;
+    margin-bottom: 20px;
+    color: #666;
+}
+
+.form-title {
+    font-size: 22px;
+    font-weight: 800;
+    text-align: center;
+    margin-bottom: 20px;
+    color: #0e382c;
+}
+
+/* Form Controls & Labels */
+.white-card-container .form-group {
+    margin-bottom: 12px;
+    text-align: left;
+}
+
+.white-card-container label {
+    display: block;
+    font-size: 11px;
+    font-weight: 800;
+    color: #333;
+    margin-bottom: 5px;
+}
+
+.white-card-container .form-control {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1.5px solid #ccc;
+    border-radius: 8px;
+    font-size: 13px;
+    outline: none;
+    transition: all 0.2s ease;
+}
+
+.white-card-container .form-control:focus {
+    border-color: #0e382c;
+    box-shadow: 0 0 5px rgba(14, 56, 44, 0.3);
+}
+
+.white-card-container .form-row {
+    display: flex;
+    gap: 12px;
+}
+
+.white-card-container .form-row .form-group {
+    flex: 1;
+}
+
+/* Action Buttons & Links */
+.white-card-container .btn-green {
+    width: 100%;
+    background-color: #e5a93c; /* Accent Gold/Yellow Button */
+    color: white;
+    border: none;
+    padding: 12px;
+    border-radius: 25px;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    display: block;
+    margin: 20px auto 0 auto;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    transition: background 0.2s ease, transform 0.1s ease;
+}
+
+.white-card-container .btn-green:hover {
+    background-color: #d4971a;
+    transform: translateY(-1px);
+}
+
+.white-card-container .card-bottom-link {
+    display: block;
+    text-align: center;
+    margin-top: 15px;
+    font-size: 12px;
+    color: #0e382c;
+    font-weight: bold;
+    text-decoration: underline;
+}
+.dropdown-menu a[href*="home"] {
+    display: none !important;
+}
