@@ -2,6 +2,7 @@ package com.consultease.app.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import com.consultease.app.model.User;
@@ -13,10 +14,13 @@ public class DataInitializer implements CommandLineRunner {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder; // 👈 Idinagdag para i-encrypt ang mga password
+
     @Override
     public void run(String... args) throws Exception {
-        // 0. 👑 Pre-create Admin Account (Hinahanap na rin via idNumber para maiwasan ang duplicate)
-        createOrUpdateAdmin("06-2526-003597", "Melvin", "Soldevilla", "mecu.soldevilla.sjc@gmail.com", "Admin123!");
+        // 0. 👑 Pre-create Admin Account
+        createOrUpdateAdmin("06-2526-003597", "Melvin", "Soldevilla", "mecu.soldevilla.sjc@phinmaed.com", "Admin123!");
 
         // 1. Pre-create or update 9 Subject Teachers with UNIQUE emails for Testing
         createOrUpdateTeacher("T-HIS007", "Henry James", "Bautista", "henry.bautista@sjc.edu.ph", "HIS 007 - Life and Works of Rizal");
@@ -34,7 +38,6 @@ public class DataInitializer implements CommandLineRunner {
     }
 
     private void createOrUpdateAdmin(String idNumber, String firstName, String lastName, String email, String rawPassword) {
-        // Hanapin muna kung existing na ba ang ID number o Email para maiwasan ang duplicate constraint error
         User admin = userRepository.findByIdNumber(idNumber)
                 .orElseGet(() -> userRepository.findByEmail(email).orElseGet(User::new));
         
@@ -46,7 +49,7 @@ public class DataInitializer implements CommandLineRunner {
         admin.setFirstName(firstName);
         admin.setLastName(lastName);
         admin.setFullName("Dr. " + firstName + " " + lastName);
-        admin.setPassword(rawPassword);
+        admin.setPassword(passwordEncoder.encode(rawPassword)); // 👈 Naka-BCrypt na ngayon
         admin.setRole(User.Role.ADMIN);
         admin.setCourse("Administration");
         admin.setCampus("PHINMA Saint Jude College Manila");
@@ -67,7 +70,7 @@ public class DataInitializer implements CommandLineRunner {
         teacher.setFirstName(firstName);
         teacher.setLastName(lastName);
         teacher.setFullName(firstName + " " + lastName);
-        teacher.setPassword("Teacher123!");
+        teacher.setPassword(passwordEncoder.encode("Teacher123!")); // 👈 Naka-BCrypt na ngayon
         teacher.setRole(User.Role.FACULTY);
         teacher.setCourse(course);
         teacher.setCampus("PHINMA Saint Jude College Manila");
@@ -88,7 +91,7 @@ public class DataInitializer implements CommandLineRunner {
         student.setFirstName(firstName);
         student.setLastName(lastName);
         student.setFullName(firstName + " " + lastName);
-        student.setPassword("Student123!");
+        student.setPassword(passwordEncoder.encode("Student123!")); // 👈 Naka-BCrypt na ngayon
         student.setRole(User.Role.STUDENT);
         student.setCourse(course);
         student.setCampus("PHINMA Saint Jude College Manila");
