@@ -13,7 +13,7 @@ public class EmailService {
 
     public void sendOtpEmail(String toEmail, String otpCode) {
         SimpleMailMessage message = new SimpleMailMessage();
-        message.setFrom("mecu.soldevilla.sjc@gmail.com");
+        message.setFrom("onboarding@resend.dev");
         message.setTo(toEmail);
         message.setSubject("ConsultEase - OTP Verification Code");
         message.setText("Your OTP verification code is: " + otpCode);
@@ -25,7 +25,7 @@ public class EmailService {
     public void sendConsultationNotification(String teacherEmail, String studentName, String date, String time, String purpose) {
         try {
             SimpleMailMessage message = new SimpleMailMessage();
-            message.setFrom("mecu.soldevilla.sjc@gmail.com");
+            message.setFrom("onboarding@resend.dev");
             message.setTo(teacherEmail);
             message.setSubject("New Consultation Request - ConsultEase");
             message.setText("Hello,\n\nYou have received a new consultation request from student: " + studentName + 
