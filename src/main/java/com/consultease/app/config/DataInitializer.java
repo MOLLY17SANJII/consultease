@@ -15,6 +15,9 @@ public class DataInitializer implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
+        // 0. 👑 Pre-create Admin Account
+        createOrUpdateAdmin("06-2526-003597", "Melvin", "Soldevilla", "mecu.soldevilla.sjc@gmail.com", "admin123");
+
         // 1. Pre-create or update 9 Subject Teachers with UNIQUE emails for Testing
         createOrUpdateTeacher("T-HIS007", "Henry James", "Bautista", "henry.bautista@sjc.edu.ph", "HIS 007 - Life and Works of Rizal");
         createOrUpdateTeacher("T-GEN003", "Mark Joshua", "Vidar", "mark.vidar@sjc.edu.ph", "GEN 003 - Science Technology and Society");
@@ -28,6 +31,26 @@ public class DataInitializer implements CommandLineRunner {
 
         // 2. Default Test Student Account
         createOrUpdateStudent("03-2223-012345", "Juan", "Cruz", "student.test.sjc@phinmaed.com", "BSIT");
+    }
+
+    private void createOrUpdateAdmin(String idNumber, String firstName, String lastName, String email, String rawPassword) {
+        User admin = userRepository.findByEmail(email).orElseGet(User::new);
+        
+        if (admin.getId() == null) {
+            admin.setEmail(email);
+            admin.setIdNumber(idNumber);
+        }
+        
+        admin.setFirstName(firstName);
+        admin.setLastName(lastName);
+        admin.setFullName("Mr. " + firstName + " " + lastName);
+        admin.setPassword(rawPassword);
+        admin.setRole(User.Role.ADMIN);
+        admin.setCourse("Administration");
+        admin.setCampus("PHINMA Saint Jude College Manila");
+        admin.setIsVerified(true);
+        
+        userRepository.save(admin);
     }
 
     private void createOrUpdateTeacher(String idNumber, String firstName, String lastName, String email, String course) {
@@ -48,7 +71,6 @@ public class DataInitializer implements CommandLineRunner {
         teacher.setIsVerified(true);
         
         userRepository.save(teacher);
-        System.out.println("Seeded/Updated Teacher Account: " + idNumber + " (" + firstName + " " + lastName + ")");
     }
 
     private void createOrUpdateStudent(String idNumber, String firstName, String lastName, String email, String course) {
@@ -69,6 +91,5 @@ public class DataInitializer implements CommandLineRunner {
         student.setIsVerified(true);
 
         userRepository.save(student);
-        System.out.println("Seeded/Updated Student Account: " + email + " [Course: " + course + "]");
     }
 }
