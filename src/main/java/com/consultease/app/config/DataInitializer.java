@@ -15,20 +15,18 @@ public class DataInitializer implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        String testTeacherEmail = "melvincbl17@gmail.com";
+        // 1. Pre-create or update 9 Subject Teachers with UNIQUE emails for Testing
+        createOrUpdateTeacher("T-HIS007", "Henry James", "Bautista", "henry.bautista@sjc.edu.ph", "HIS 007 - Life and Works of Rizal");
+        createOrUpdateTeacher("T-GEN003", "Mark Joshua", "Vidar", "mark.vidar@sjc.edu.ph", "GEN 003 - Science Technology and Society");
+        createOrUpdateTeacher("T-PED032", "Rafael", "De Torres", "rafael.detorres@sjc.edu.ph", "PED 032 - Physical Activities Towards Health and Fitness");
+        createOrUpdateTeacher("T-ITE300", "Angel Mae", "Galario", "angelmae.galario@sjc.edu.ph", "ITE 300 - Object Oriented Programming");
+        createOrUpdateTeacher("T-ITE298", "Angelo Jeric", "Trias", "angelojeric.trias@sjc.edu.ph", "ITE 298 - Information Management");
+        createOrUpdateTeacher("T-ITE292", "Sigfried", "Breton", "sigfried.breton@sjc.edu.ph", "ITE 292 - Networking 1");
+        createOrUpdateTeacher("T-ITE031", "Mark Anthony", "Cezar", "markanthony.cezar@sjc.edu.ph", "ITE 031 - Data Structures and Algorithms");
+        createOrUpdateTeacher("T-ITE083", "Renjun", "Orain", "renjun.orain@sjc.edu.ph", "ITE 083 - IT Project Management");
+        createOrUpdateTeacher("T-SSP005", "Maeryll Joy", "Fidelson", "maerylljoy.fidelson@sjc.edu.ph", "SSP 005 - Student Success Program 1");
 
-        // 1. Pre-create or update 9 Subject Teachers for Testing
-        createOrUpdateTeacher("T-HIS007", "Henry James", "Bautista", testTeacherEmail, "HIS 007 - Life and Works of Rizal");
-        createOrUpdateTeacher("T-GEN003", "Mark Joshua", "Vidar", testTeacherEmail, "GEN 003 - Science Technology and Society");
-        createOrUpdateTeacher("T-PED032", "Rafael", "De Torres", testTeacherEmail, "PED 032 - Physical Activities Towards Health and Fitness");
-        createOrUpdateTeacher("T-ITE300", "Angel Mae", "Galario", testTeacherEmail, "ITE 300 - Object Oriented Programming");
-        createOrUpdateTeacher("T-ITE298", "Angelo Jeric", "Trias", testTeacherEmail, "ITE 298 - Information Management");
-        createOrUpdateTeacher("T-ITE292", "Sigfried", "Breton", testTeacherEmail, "ITE 292 - Networking 1");
-        createOrUpdateTeacher("T-ITE031", "Mark Anthony", "Cezar", testTeacherEmail, "ITE 031 - Data Structures and Algorithms");
-        createOrUpdateTeacher("T-ITE083", "Renjun", "Orain", testTeacherEmail, "ITE 083 - IT Project Management");
-        createOrUpdateTeacher("T-SSP005", "Maeryll Joy", "Fidelson", testTeacherEmail, "SSP 005 - Student Success Program 1");
-
-        // 2. ➕ IDINAGDAG: Default Test Student Account (Para sa mabilisang Course testing)
+        // 2. Default Test Student Account
         createOrUpdateStudent("03-2223-012345", "Juan", "Cruz", "student.test.sjc@phinmaed.com", "BSIT");
     }
 
