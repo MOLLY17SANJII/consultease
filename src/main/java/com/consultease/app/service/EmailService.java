@@ -51,8 +51,8 @@ public class EmailService {
     }
 
     private void sendViaResendApi(String to, String subject, String textContent) {
-        // Alisin ang anumang hidden spaces o newlines sa API key para maiwasan ang header error
-        String cleanApiKey = resendApiKey != null ? resendApiKey.trim() : "";
+        // Tanggalin ang lahat maliban sa mga titik, numero, at underscore para maiwasan ang header error
+        String cleanApiKey = resendApiKey != null ? resendApiKey.replaceAll("[^a-zA-Z0-9_]", "") : "";
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
