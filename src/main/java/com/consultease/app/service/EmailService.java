@@ -51,9 +51,12 @@ public class EmailService {
     }
 
     private void sendViaResendApi(String to, String subject, String textContent) {
+        // Alisin ang anumang hidden spaces o newlines sa API key para maiwasan ang header error
+        String cleanApiKey = resendApiKey != null ? resendApiKey.trim() : "";
+
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.set("Authorization", "Bearer " + resendApiKey);
+        headers.set("Authorization", "Bearer " + cleanApiKey);
 
         Map<String, Object> body = new HashMap<>();
         body.put("from", "ConsultEase <onboarding@resend.dev>");
