@@ -15,8 +15,8 @@ public class DataInitializer implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        // 0. 👑 Pre-create Admin Account
-        createOrUpdateAdmin("06-2526-003597", "Melvin", "Soldevilla", "mecu.soldevilla.sjc@phinmaed.com", "admin123");
+        // 0. 👑 Pre-create Admin Account (Hinahanap na rin via idNumber para maiwasan ang duplicate)
+        createOrUpdateAdmin("06-2526-003597", "Melvin", "Soldevilla", "mecu.soldevilla.sjc@gmail.com", "Admin123!");
 
         // 1. Pre-create or update 9 Subject Teachers with UNIQUE emails for Testing
         createOrUpdateTeacher("T-HIS007", "Henry James", "Bautista", "henry.bautista@sjc.edu.ph", "HIS 007 - Life and Works of Rizal");
@@ -34,7 +34,9 @@ public class DataInitializer implements CommandLineRunner {
     }
 
     private void createOrUpdateAdmin(String idNumber, String firstName, String lastName, String email, String rawPassword) {
-        User admin = userRepository.findByEmail(email).orElseGet(User::new);
+        // Hanapin muna kung existing na ba ang ID number o Email para maiwasan ang duplicate constraint error
+        User admin = userRepository.findByIdNumber(idNumber)
+                .orElseGet(() -> userRepository.findByEmail(email).orElseGet(User::new));
         
         if (admin.getId() == null) {
             admin.setEmail(email);
@@ -43,7 +45,7 @@ public class DataInitializer implements CommandLineRunner {
         
         admin.setFirstName(firstName);
         admin.setLastName(lastName);
-        admin.setFullName("Mr. " + firstName + " " + lastName);
+        admin.setFullName("Dr. " + firstName + " " + lastName);
         admin.setPassword(rawPassword);
         admin.setRole(User.Role.ADMIN);
         admin.setCourse("Administration");
@@ -54,16 +56,17 @@ public class DataInitializer implements CommandLineRunner {
     }
 
     private void createOrUpdateTeacher(String idNumber, String firstName, String lastName, String email, String course) {
-        User teacher = userRepository.findByIdNumber(idNumber).orElseGet(User::new);
+        User teacher = userRepository.findByIdNumber(idNumber)
+                .orElseGet(() -> userRepository.findByEmail(email).orElseGet(User::new));
         
         if (teacher.getId() == null) {
             teacher.setIdNumber(idNumber);
+            teacher.setEmail(email);
         }
         
         teacher.setFirstName(firstName);
         teacher.setLastName(lastName);
         teacher.setFullName(firstName + " " + lastName);
-        teacher.setEmail(email);
         teacher.setPassword("Teacher123!");
         teacher.setRole(User.Role.FACULTY);
         teacher.setCourse(course);
@@ -74,13 +77,14 @@ public class DataInitializer implements CommandLineRunner {
     }
 
     private void createOrUpdateStudent(String idNumber, String firstName, String lastName, String email, String course) {
-        User student = userRepository.findByEmail(email).orElseGet(User::new);
+        User student = userRepository.findByIdNumber(idNumber)
+                .orElseGet(() -> userRepository.findByEmail(email).orElseGet(User::new));
 
         if (student.getId() == null) {
             student.setEmail(email);
+            student.setIdNumber(idNumber);
         }
 
-        student.setIdNumber(idNumber);
         student.setFirstName(firstName);
         student.setLastName(lastName);
         student.setFullName(firstName + " " + lastName);
