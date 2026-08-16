@@ -15,14 +15,12 @@ public class DataInitializer implements CommandLineRunner {
     private UserRepository userRepository;
 
     @Autowired
-    private PasswordEncoder passwordEncoder; // 👈 Idinagdag para i-encrypt ang mga password
+    private PasswordEncoder passwordEncoder;
 
     @Override
     public void run(String... args) throws Exception {
-        // 0. 👑 Pre-create Admin Account
         createOrUpdateAdmin("06-2526-003597", "Melvin", "Soldevilla", "mecu.soldevilla.sjc@phinmaed.com", "Admin123!");
 
-        // 1. Pre-create or update 9 Subject Teachers with UNIQUE emails for Testing
         createOrUpdateTeacher("T-HIS007", "Henry James", "Bautista", "henry.bautista@sjc.edu.ph", "HIS 007 - Life and Works of Rizal");
         createOrUpdateTeacher("T-GEN003", "Mark Joshua", "Vidar", "mark.vidar@sjc.edu.ph", "GEN 003 - Science Technology and Society");
         createOrUpdateTeacher("T-PED032", "Rafael", "De Torres", "rafael.detorres@sjc.edu.ph", "PED 032 - Physical Activities Towards Health and Fitness");
@@ -33,7 +31,6 @@ public class DataInitializer implements CommandLineRunner {
         createOrUpdateTeacher("T-ITE083", "Renjun", "Orain", "renjun.orain@sjc.edu.ph", "ITE 083 - IT Project Management");
         createOrUpdateTeacher("T-SSP005", "Maeryll Joy", "Fidelson", "maerylljoy.fidelson@sjc.edu.ph", "SSP 005 - Student Success Program 1");
 
-        // 2. Default Test Student Account
         createOrUpdateStudent("03-2223-012345", "Juan", "Cruz", "student.test.sjc@phinmaed.com", "BSIT");
     }
 
@@ -70,7 +67,7 @@ public class DataInitializer implements CommandLineRunner {
         teacher.setFirstName(firstName);
         teacher.setLastName(lastName);
         teacher.setFullName(firstName + " " + lastName);
-        teacher.setPassword(passwordEncoder.encode("Teacher123!")); // 👈 Naka-BCrypt na ngayon
+        teacher.setPassword(passwordEncoder.encode("Teacher123!"));
         teacher.setRole(User.Role.FACULTY);
         teacher.setCourse(course);
         teacher.setCampus("PHINMA Saint Jude College Manila");

@@ -248,7 +248,7 @@
 
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
             gap: 16px;
             margin-bottom: 24px;
         }
@@ -414,16 +414,6 @@
             outline: none;
         }
 
-        .field-badge-info {
-            font-size: 10px;
-            font-weight: 600;
-            color: var(--accent-gold);
-            background: rgba(226, 171, 34, 0.15);
-            padding: 2px 6px;
-            border-radius: 4px;
-            text-transform: none;
-        }
-
         .btn-book {
             background: linear-gradient(135deg, var(--primary-green) 0%, var(--dark-green) 100%);
             color: white;
@@ -553,11 +543,8 @@
             <div class="d-flex align-items-center">
                 <i class="fa-solid fa-triangle-exclamation fs-4 me-3 text-danger"></i>
                 <div>
-                    <strong class="text-danger" th:if="${param.error[0] == 'doubleBooked'}">Slot Already Booked!</strong>
-                    <p class="mb-0 small text-dark" th:if="${param.error[0] == 'doubleBooked'}">
-                        This faculty member already has an approved consultation scheduled for that exact date and time. Please select a different schedule or time slot.
-                    </p>
-                    <span class="text-danger" th:unless="${param.error[0] == 'doubleBooked'}" th:text="${param.error[0]}">An error occurred while processing your request.</span>
+                    <strong class="text-danger" th:if="${param.error[0] == 'doubleBooked'}">Request Error!</strong>
+                    <p class="mb-0 small text-dark" th:unless="${param.error[0] == 'doubleBooked'}" th:text="${param.error[0]}">An error occurred while processing your request.</p>
                 </div>
             </div>
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
@@ -584,9 +571,9 @@
                 </div>
                 <div class="fs-6 fw-bold" th:text="${nextUpcoming.targetHead}">Prof. Angelo Jeric Trias</div>
                 <div class="small text-light opacity-75">
-                    <i class="fa-regular fa-calendar me-1"></i> <span th:text="${nextUpcoming.preferredDate}">2026-08-12</span>
-                    <i class="fa-regular fa-clock ms-3 me-1"></i> <span th:text="${nextUpcoming.preferredTime}">14:00</span>
-                    <span class="ms-3 badge bg-light text-dark" th:text="${nextUpcoming.meetingMode != null ? nextUpcoming.meetingMode : 'In-Person'}">In-Person</span>
+                    <i class="fa-regular fa-calendar me-1"></i> <span th:text="${nextUpcoming.preferredDate}">To be set by teacher</span>
+                    <i class="fa-regular fa-clock ms-3 me-1"></i> <span th:text="${nextUpcoming.preferredTime}">To be set</span>
+                    <span class="ms-3 badge bg-light text-dark" th:text="${nextUpcoming.meetingMode != null ? nextUpcoming.meetingMode : 'Pending Assignment'}">In-Person</span>
                 </div>
             </div>
             <div>
@@ -594,6 +581,7 @@
             </div>
         </div>
 
+        <!-- Updated 4 Stat Cards: Total Requests, Pending, Approved, Rejected -->
         <div class="stats-grid">
             <div class="stat-card">
                 <div>
@@ -611,10 +599,17 @@
             </div>
             <div class="stat-card">
                 <div>
-                    <h4>Upcoming</h4>
+                    <h4>Approved</h4>
                     <div class="number" th:text="${approvedCount != null ? approvedCount : 0}">0</div>
                 </div>
-                <i class="fa-solid fa-user-clock"></i>
+                <i class="fa-solid fa-circle-check"></i>
+            </div>
+            <div class="stat-card">
+                <div>
+                    <h4>Rejected</h4>
+                    <div class="number" th:text="${declinedCount != null ? declinedCount : 0}">0</div>
+                </div>
+                <i class="fa-solid fa-circle-xmark"></i>
             </div>
         </div>
 
@@ -644,8 +639,8 @@
                             <thead>
                                 <tr>
                                     <th style="width: 25%;">Target / Faculty</th>
-                                    <th style="width: 20%;">Purpose</th>
-                                    <th style="width: 18%;">Schedule</th>
+                                    <th style="width: 25%;">Purpose</th>
+                                    <th style="width: 20%;">Schedule</th>
                                     <th style="width: 12%;">Mode</th>
                                     <th style="width: 12%;">Status</th>
                                     <th style="width: 13%;">Action</th>
@@ -668,11 +663,11 @@
                                         </div>
                                     </td>
                                     <td>
-                                        <div th:text="${c.preferredDate}">Date</div>
-                                        <div class="small text-muted" th:text="${c.preferredTime}">Time</div>
+                                        <div th:text="${c.preferredDate}">Pending approval</div>
+                                        <div class="small text-muted" th:text="${c.preferredTime}">—</div>
                                     </td>
                                     <td>
-                                        <span class="badge bg-light text-dark border" th:text="${c.meetingMode != null ? c.meetingMode : 'In-Person'}">In-Person</span>
+                                        <span class="badge bg-light text-dark border" th:text="${c.meetingMode != null ? c.meetingMode : 'Pending'}">—</span>
                                     </td>
                                     <td>
                                         <span th:class="'badge-custom badge-' + ${c.status}">
@@ -702,7 +697,7 @@
 
                 <div class="card-custom">
                     <h3><i class="fa-solid fa-chalkboard-user"></i> Teachers Consultation Hours</h3>
-                    <p class="small text-muted mb-2">Select a professor in the request form to filter their specific available slots, or click <strong>Select Slot</strong> below to auto-fill the request date & time.</p>
+                    <p class="small text-muted mb-2">Select a professor in the request form to view their specific consultation hours, or click <strong>Select Professor</strong> below to auto-fill the form.</p>
                     
                     <div class="table-responsive-custom">
                         <table class="table custom-table" id="schedulesTable">
@@ -725,9 +720,8 @@
                                     </td>
                                     <td>
                                         <button type="button" class="btn btn-sm btn-outline-success py-0 px-2 btn-select-slot" style="font-size:11px;" 
-                                                th:data-faculty="${s.faculty != null ? (s.faculty.fullName != null and !#strings.isEmpty(s.faculty.fullName) ? s.faculty.fullName : (s.faculty.firstName != null ? s.faculty.firstName : '')) : ''}"
-                                                th:data-timeslot="${s.timeSlot}">
-                                            <i class="fa-solid fa-check me-1"></i> Select Slot
+                                                th:data-faculty="${s.faculty != null ? (s.faculty.fullName != null and !#strings.isEmpty(s.faculty.fullName) ? s.faculty.fullName : (s.faculty.firstName != null ? s.faculty.firstName : '')) : ''}">
+                                            <i class="fa-solid fa-check me-1"></i> Select Professor
                                         </button>
                                     </td>
                                 </tr>
@@ -742,7 +736,7 @@
                 </div>
             </div>
 
-            <!-- Right Side: Aesthetic Booking Form Card -->
+            <!-- Right Side: Streamlined Booking Form Card -->
             <div class="col-lg-5 col-12">
                 <div class="card-custom">
                     <h3><i class="fa-solid fa-calendar-plus"></i> Request Consultation</h3>
@@ -768,71 +762,11 @@
                             </div>
                         </div>
 
-                        <!-- Date & Time Row -->
-                        <div class="row g-2">
-                            <div class="col-6">
-                                <div class="form-group-custom">
-                                    <label for="preferredDate">
-                                        <span>Preferred Date</span>
-                                        <span class="field-badge-info">Mon - Sat</span>
-                                    </label>
-                                    <div class="custom-input-group">
-                                        <i class="fa-solid fa-calendar-days input-icon"></i>
-                                        <input type="date" id="preferredDate" name="preferredDate" required>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="col-6">
-                                <div class="form-group-custom">
-                                    <label for="preferredTime">
-                                        <span>Time Slot</span>
-                                        <span class="field-badge-info">8 AM - 5 PM</span>
-                                    </label>
-                                    <div class="custom-input-group">
-                                        <i class="fa-solid fa-clock input-icon"></i>
-                                        <select id="preferredTime" name="preferredTime" required>
-                                            <option value="" disabled selected>-- Select Time --</option>
-                                            <option value="08:00 AM">08:00 AM</option>
-                                            <option value="08:30 AM">08:30 AM</option>
-                                            <option value="09:00 AM">09:00 AM</option>
-                                            <option value="09:30 AM">09:30 AM</option>
-                                            <option value="10:00 AM">10:00 AM</option>
-                                            <option value="10:30 AM">10:30 AM</option>
-                                            <option value="11:00 AM">11:00 AM</option>
-                                            <option value="11:30 AM">11:30 AM</option>
-                                            <option value="01:00 PM">01:00 PM</option>
-                                            <option value="01:30 PM">01:30 PM</option>
-                                            <option value="02:00 PM">02:00 PM</option>
-                                            <option value="02:30 PM">02:30 PM</option>
-                                            <option value="03:00 PM">03:00 PM</option>
-                                            <option value="03:30 PM">03:30 PM</option>
-                                            <option value="04:00 PM">04:00 PM</option>
-                                            <option value="04:30 PM">04:30 PM</option>
-                                            <option value="05:00 PM">05:00 PM</option>
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Consultation Mode -->
-                        <div class="form-group-custom">
-                            <label for="meetingMode">Consultation Mode / Location</label>
-                            <div class="custom-input-group">
-                                <i class="fa-solid fa-location-dot input-icon"></i>
-                                <select id="meetingMode" name="meetingMode" required>
-                                    <option value="In-Person" selected>📍 In-Person (Faculty Office / Room)</option>
-                                    <option value="Online">💻 Online (Google Meet / Teams)</option>
-                                </select>
-                            </div>
-                        </div>
-
                         <!-- Purpose -->
                         <div class="form-group-custom">
                             <label for="purpose">Purpose of Consultation</label>
                             <div class="custom-input-group">
-                                <textarea id="purpose" name="purpose" rows="3" placeholder="State your reason or concerns for meeting..." required></textarea>
+                                <textarea id="purpose" name="purpose" rows="4" placeholder="State your reason or concerns for meeting..." required></textarea>
                             </div>
                         </div>
 
@@ -962,28 +896,6 @@
                 });
             }
 
-            // Date Input Setup & Sunday Restriction
-            const dateInput = document.getElementById('preferredDate');
-            if (dateInput) {
-                // Set local minimum date to today
-                const now = new Date();
-                const yyyy = now.getFullYear();
-                const mm = String(now.getMonth() + 1).padStart(2, '0');
-                const dd = String(now.getDate()).padStart(2, '0');
-                dateInput.setAttribute('min', `${yyyy}-${mm}-${dd}`);
-
-                // Restrict Sunday selections (Day 0 = Sunday)
-                dateInput.addEventListener('change', function() {
-                    if (this.value) {
-                        const selectedDate = new Date(this.value + 'T00:00:00');
-                        if (selectedDate.getDay() === 0) {
-                            alert('⚠️ Sunday is a rest day. Please select a valid day from Monday to Saturday.');
-                            this.value = '';
-                        }
-                    }
-                });
-            }
-
             // Toast Notifications via URL Params (Success and Error)
             const urlParams = new URLSearchParams(window.location.search);
             const container = document.getElementById('toast-container');
@@ -1009,8 +921,6 @@
                 toast.style.borderColor = '#f8c2c8';
                 
                 let message = "An error occurred while processing your request.";
-                if (urlParams.get('error') === 'doubleBooked') message = "Slot Already Booked! Please choose another time.";
-
                 toast.innerHTML = '<div style="display:flex;align-items:center;gap:10px;"><i class="fa-solid fa-circle-exclamation" style="color:#ffffff;"></i><span>' + message + '</span></div><i class="fa-solid fa-xmark" style="cursor:pointer" onclick="this.parentElement.remove()"></i>';
                 container.appendChild(toast);
                 setTimeout(function() { if (toast && toast.parentElement) toast.remove(); }, 6000);
@@ -1021,8 +931,7 @@
                 const slotBtn = e.target.closest('.btn-select-slot');
                 if (slotBtn) {
                     const facultyName = slotBtn.getAttribute('data-faculty');
-                    const timeSlot = slotBtn.getAttribute('data-timeslot');
-                    autoFillSlot(facultyName, timeSlot);
+                    autoFillFaculty(facultyName);
                 }
             });
 
@@ -1146,8 +1055,8 @@
             });
         }
 
-        // Auto-fill slot into the booking form
-        function autoFillSlot(facultyName, timeSlot) {
+        // Auto-fill professor in booking form
+        function autoFillFaculty(facultyName) {
             const select = document.getElementById('targetHead');
             if (select && facultyName) {
                 const searchName = facultyName.toLowerCase().trim();
@@ -1162,46 +1071,8 @@
                     }
                 }
             }
-
-            // Auto-select corresponding time slot in the dropdown
-            if (timeSlot) {
-                const timeSelect = document.getElementById('preferredTime');
-                if (timeSelect) {
-                    const cleanSlot = timeSlot.toUpperCase().trim();
-                    let matched = false;
-                    for (let i = 0; i < timeSelect.options.length; i++) {
-                        if (timeSelect.options[i].value.toUpperCase().includes(cleanSlot) || cleanSlot.includes(timeSelect.options[i].value.toUpperCase())) {
-                            timeSelect.selectedIndex = i;
-                            matched = true;
-                            break;
-                        }
-                    }
-                    // Fallback matching if 24h or format differs
-                    if (!matched) {
-                        const timeMatch = timeSlot.match(/(\d+):(\d+)\s*(AM|PM)?/i);
-                        if (timeMatch) {
-                            let hours = parseInt(timeMatch[1], 10);
-                            const minutes = timeMatch[2];
-                            const ampm = timeMatch[3] ? timeMatch[3].toUpperCase() : (hours >= 12 ? 'PM' : 'AM');
-                            if (hours > 12) hours -= 12;
-                            if (hours === 0) hours = 12;
-                            const formattedHours = hours < 10 ? '0' + hours : hours;
-                            const searchStr = `${formattedHours}:${minutes} ${ampm}`;
-
-                            for (let i = 0; i < timeSelect.options.length; i++) {
-                                if (timeSelect.options[i].value === searchStr) {
-                                    timeSelect.selectedIndex = i;
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
             filterSchedulesByTeacher();
-            const dateInput = document.getElementById('preferredDate');
-            if (dateInput) dateInput.focus();
+            select.focus();
         }
 
         // Status tab filtering
@@ -1242,7 +1113,6 @@
                 }
             });
 
-            // Feedback row when search/filter returns empty
             let noMatchRow = document.getElementById('noFilterMatchRow');
             if (visibleCount === 0 && rows.length > 0) {
                 if (!noMatchRow) {
@@ -1259,37 +1129,5 @@
             }
         }
     </script>
-            <script>
-            window.difyChatbotConfig = {
-            token: '1szwYlurpXrozKqH',
-            baseUrl: 'https://udify.app',
-            inputs: {
-                // You can define the inputs from the Start node here
-                // key is the variable name
-            },
-            systemVariables: {
-                // user_id: 'YOU CAN DEFINE USER ID HERE',
-                // conversation_id: 'YOU CAN DEFINE CONVERSATION ID HERE, IT MUST BE A VALID UUID',
-            },
-            userVariables: {
-                // avatar_url: 'YOU CAN DEFINE USER AVATAR URL HERE',
-                // name: 'YOU CAN DEFINE USER NAME HERE',
-            },
-            }
-            </script>
-            <script
-            src="https://udify.app/embed.min.js"
-            id="1szwYlurpXrozKqH"
-            defer>
-            </script>
-            <style>
-            #dify-chatbot-bubble-button {
-                background-color: #1C64F2 !important;
-            }
-            #dify-chatbot-bubble-window {
-                width: 24rem !important;
-                height: 40rem !important;
-            }
-            </style>
 </body>
 </html>

@@ -6,9 +6,13 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.security.Principal;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -324,6 +328,9 @@ public class PageController {
         return "redirect:/admin/dashboard?error=notFound";
     }
 
+    // ==========================================
+    // 🏫 FACULTY DASHBOARD CONTROLLER METHODS
+    // ==========================================
     @GetMapping("/faculty/dashboard")
     public String showFacultyDashboard(Principal principal, HttpSession session, Model model) {
         if (principal == null) {
@@ -347,6 +354,7 @@ public class PageController {
         long pendingCount = consultationRepository.countByTargetHeadContainingAndStatus(facultyKeyword, "PENDING");
         long approvedCount = consultationRepository.countByTargetHeadContainingAndStatus(facultyKeyword, "APPROVED");
         long completedCount = consultationRepository.countByTargetHeadContainingAndStatus(facultyKeyword, "COMPLETED");
+        long declinedCount = consultationRepository.countByTargetHeadContainingAndStatus(facultyKeyword, "DECLINED");
 
         model.addAttribute("consultations", consultations);
         model.addAttribute("schedules", schedules);
@@ -354,6 +362,7 @@ public class PageController {
         model.addAttribute("pendingCount", pendingCount);
         model.addAttribute("approvedCount", approvedCount);
         model.addAttribute("completedCount", completedCount);
+        model.addAttribute("declinedCount", declinedCount);
 
         return "faculty-dashboard";
     }
@@ -419,7 +428,7 @@ public class PageController {
 
             sendStatusUpdateEmailToStudent(consultation);
 
-            redirectAttributes.addFlashAttribute("successMessage", "Consultation request status updated!");
+            redirectAttributes.addFlashAttribute("successMessage", "Consultation request status updated successfully!");
         } else {
             redirectAttributes.addFlashAttribute("errorMessage", "Request not found.");
         }
@@ -460,6 +469,9 @@ public class PageController {
         return "redirect:/faculty/dashboard?success=scheduleDeleted";
     }
 
+    // ==========================================
+    // 👨‍🎓 STUDENT DASHBOARD & BOOKING METHODS
+    // ==========================================
     @GetMapping("/student/dashboard")
     public String showDashboard(
             @RequestParam(value = "dept", required = false) String dept,
@@ -488,13 +500,47 @@ public class PageController {
 
         List<User> facultyList = userRepository.filterFaculty(dept, search);
         List<Map<String, String>> availableSubjects = getSubjectsByCourse(loggedInUser.getCourse());
-
         List<Consultation> consultations = consultationRepository.findByUserOrderByIdDesc(loggedInUser);
-        List<FacultySchedule> allSchedules = facultyScheduleRepository.findAll();
+        
+        // 🕒 Faculty Schedule time filtering: Hide schedule slots if current time has passed the end time for today
+        List<FacultySchedule> rawSchedules = facultyScheduleRepository.findAll();
+        List<FacultySchedule> allSchedules = new ArrayList<>();
+
+        LocalDate today = LocalDate.now();
+        LocalTime currentTime = LocalTime.now();
+        String currentDayStr = today.getDayOfWeek().name(); // e.g., "TUESDAY"
+
+        for (FacultySchedule sched : rawSchedules) {
+            boolean showSchedule = true;
+            if (sched.getDayOfWeek() != null) {
+                String dbDay = sched.getDayOfWeek().trim().toUpperCase();
+                if (dbDay.contains(currentDayStr) || currentDayStr.contains(dbDay)) {
+                    try {
+                        String[] parts = sched.getTimeSlot().split("-");
+                        if (parts.length >= 2) {
+                            String endTimeStr = parts[1].trim(); // Extracts e.g. "02:00 PM"
+                            DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("hh:mm a", Locale.ENGLISH);
+                            LocalTime endTime = LocalTime.parse(endTimeStr, timeFormatter);
+                            
+                            // If current time is past the schedule end time today, hide it
+                            if (currentTime.isAfter(endTime)) {
+                                showSchedule = false;
+                            }
+                        }
+                    } catch (Exception e) {
+                        // Keep schedule if parsing fails to prevent breaking the UI
+                    }
+                }
+            }
+            if (showSchedule) {
+                allSchedules.add(sched);
+            }
+        }
 
         long totalCount = consultationRepository.countByUser(loggedInUser);
         long pendingCount = consultationRepository.countByUserAndStatus(loggedInUser, "PENDING");
         long approvedCount = consultationRepository.countByUserAndStatus(loggedInUser, "APPROVED");
+        long declinedCount = consultationRepository.countByUserAndStatus(loggedInUser, "DECLINED");
 
         Consultation nextUpcoming = consultations.stream()
                 .filter(c -> "APPROVED".equalsIgnoreCase(c.getStatus()))
@@ -516,11 +562,11 @@ public class PageController {
         model.addAttribute("totalCount", totalCount);
         model.addAttribute("pendingCount", pendingCount);
         model.addAttribute("approvedCount", approvedCount);
+        model.addAttribute("declinedCount", declinedCount);
 
         return "student-dashboard";
     }
 
-    // 📮 BOOK CONSULTATION WITH FILE ATTACHMENT, TEACHER NOTIFICATION & STUDENT SUBMISSION CONFIRMATION
     @PostMapping("/book-consultation")
     public String bookConsultation(
             @RequestParam("targetHead") String targetHead,
@@ -603,7 +649,7 @@ public class PageController {
                 System.err.println("⚠️ Warning: Could not send email notification to teacher: " + mailEx.getMessage());
             }
 
-            // 2️⃣ NEW: Send Submission Confirmation Email to Student
+            // 2️⃣ Send Submission Confirmation Email to Student
             try {
                 if (loggedInUser.getEmail() != null) {
                     emailService.sendConsultationSubmittedEmail(

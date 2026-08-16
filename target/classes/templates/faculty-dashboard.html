@@ -374,7 +374,7 @@
                 <div class="dropdown-user-details">
                     <div class="dropdown-welcome">
                         Welcome<br>
-                        <span th:text="${profName != null ? profName : (session.loggedInUser != null ? session.loggedInUser.fullName : 'Prof. Mariela Jennifer')}">Prof. Mariela Jennifer</span>
+                        <span th:text="${profName != null ? profName : (session.loggedInUser != null ? session.loggedInUser.fullName : 'Faculty Member')}">Prof. Name</span>
                     </div>
                     <div class="dropdown-designation">Designation: Faculty Member</div>
                 </div>
@@ -473,7 +473,7 @@
                                     </td>
                                     <td>
                                         <span th:text="${c.purpose != null ? c.purpose : 'N/A'}">Purpose of meeting</span>
-                                        <small class="d-block text-muted" th:if="${c.meetingType != null}" th:text="'Mode: ' + ${c.meetingType}">Mode: In-Person</small>
+                                        <small class="d-block text-muted" th:if="${c.meetingMode != null}" th:text="'Mode: ' + ${c.meetingMode}">Mode: In-Person</small>
                                     </td>
                                     <td>
                                         <div class="fw-semibold" th:text="${c.preferredDate != null ? c.preferredDate : 'N/A'}">2026-08-12</div>
