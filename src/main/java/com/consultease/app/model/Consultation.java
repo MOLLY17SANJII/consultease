@@ -29,6 +29,7 @@ public class Consultation {
 
     private String attachmentPath;
     private String meetingMode;
+    private String meetingType; // Added to match the Thymeleaf template expression[cite: 16]
 
     public Consultation() {}
 
@@ -63,4 +64,7 @@ public class Consultation {
 
     public String getMeetingMode() { return meetingMode; }
     public void setMeetingMode(String meetingMode) { this.meetingMode = meetingMode; }
+
+    public String getMeetingType() { return meetingType; }
+    public void setMeetingType(String meetingType) { this.meetingType = meetingType; }
 }

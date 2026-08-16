@@ -49,7 +49,6 @@ public class PageController {
     @Autowired
     private FacultyScheduleRepository facultyScheduleRepository;
 
-    // 🟢 UPDATED: ROOT (/) AND /home BOTH RENDER THE LANDING PAGE
     @GetMapping({"/", "/home"})
     public String showHomePage(Principal principal, HttpSession session, Model model) {
         if (principal != null) {
@@ -112,14 +111,9 @@ public class PageController {
 
         String otpCode = String.valueOf((int)(Math.random() * 900000) + 100000);
         
-        System.out.println("==========================================");
-        System.out.println("GENERATED OTP FOR " + email + ": " + otpCode);
-        System.out.println("==========================================");
-
         try {
             emailService.sendOtpEmail(email, otpCode);
         } catch (Exception e) {
-            System.err.println("❌ ERROR SENDING EMAIL: " + e.getMessage());
             model.addAttribute("errorMessage", "Failed to send OTP email. Please try again later.");
             return "register";
         }
@@ -139,11 +133,31 @@ public class PageController {
     }
 
     @GetMapping("/otp-verify")
-    public String showOtpPage(HttpSession session) {
+    public String showOtpPage(HttpSession session, Model model) {
         if (session.getAttribute("generated_otp") == null) {
             return "redirect:/register";
         }
+        model.addAttribute("maskedEmail", session.getAttribute("temp_email"));
         return "otp-verify";
+    }
+
+    @GetMapping("/otp-resend")
+    public String resendOtp(HttpSession session, RedirectAttributes redirectAttributes) {
+        String email = (String) session.getAttribute("temp_email");
+        if (email == null) {
+            return "redirect:/register";
+        }
+
+        String newOtpCode = String.valueOf((int)(Math.random() * 900000) + 100000);
+        try {
+            emailService.sendOtpEmail(email, newOtpCode);
+            session.setAttribute("generated_otp", newOtpCode);
+            redirectAttributes.addFlashAttribute("successMessage", "A new OTP code has been sent to your email.");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Failed to resend OTP email. Please try again.");
+        }
+
+        return "redirect:/otp-verify";
     }
 
     @PostMapping("/otp-verify")
@@ -185,7 +199,6 @@ public class PageController {
         return "otp-verify";
     }
 
-    // 👑 ADMIN DASHBOARD GET ROUTE
     @GetMapping("/admin/dashboard")
     public String showAdminDashboard(Model model) {
         List<User> users = userRepository.findAll();
@@ -209,7 +222,6 @@ public class PageController {
         return "admin-dashboard";
     }
 
-    // 👑 ADMIN POST ROUTE: CREATE FACULTY / STAFF ACCOUNT DIRECTLY
     @PostMapping("/admin/create-faculty")
     public String createFacultyAccount(
             @RequestParam("fullName") String fullName,
@@ -251,7 +263,6 @@ public class PageController {
         }
     }
 
-    // 👑 ADMIN POST ROUTE: UPDATE USER
     @PostMapping("/admin/update-user")
     public String updateUser(
             @RequestParam("userId") Long userId,
@@ -284,7 +295,6 @@ public class PageController {
         return "redirect:/admin/dashboard?error=notFound";
     }
 
-    // 👑 ADMIN POST ROUTE: DELETE USER
     @PostMapping("/admin/delete-user")
     public String deleteUser(@RequestParam("userId") Long userId, RedirectAttributes redirectAttributes) {
         if (userRepository.existsById(userId)) {
@@ -295,7 +305,6 @@ public class PageController {
         return "redirect:/admin/dashboard?error=notFound";
     }
 
-    // 👑 ADMIN POST ROUTE: UPDATE CONSULTATION STATUS
     @PostMapping("/admin/update-consultation-status")
     public String updateAdminConsultationStatus(
             @RequestParam("consultationId") Long consultationId,
@@ -306,13 +315,15 @@ public class PageController {
         if (consultation != null) {
             consultation.setStatus(status.toUpperCase());
             consultationRepository.save(consultation);
+
+            sendStatusUpdateEmailToStudent(consultation);
+
             redirectAttributes.addFlashAttribute("successMessage", "Consultation status updated!");
             return "redirect:/admin/dashboard?success=consultationUpdated";
         }
         return "redirect:/admin/dashboard?error=notFound";
     }
 
-    // 🎓 FACULTY DASHBOARD VIEW HANDLER
     @GetMapping("/faculty/dashboard")
     public String showFacultyDashboard(Principal principal, HttpSession session, Model model) {
         if (principal == null) {
@@ -347,7 +358,6 @@ public class PageController {
         return "faculty-dashboard";
     }
 
-    // 🎓 FACULTY: APPROVE CONSULTATION REQUEST
     @PostMapping("/faculty/approve-consultation")
     public String approveConsultation(
             @RequestParam("consultationId") Long consultationId,
@@ -358,6 +368,8 @@ public class PageController {
             consultation.setStatus("APPROVED");
             consultationRepository.save(consultation);
 
+            sendStatusUpdateEmailToStudent(consultation);
+
             redirectAttributes.addFlashAttribute("successMessage", "Consultation request approved successfully!");
         } else {
             redirectAttributes.addFlashAttribute("errorMessage", "Request not found.");
@@ -366,7 +378,6 @@ public class PageController {
         return "redirect:/faculty/dashboard?success=approved";
     }
 
-    // 🎓 FACULTY: DECLINE CONSULTATION REQUEST WITH REMARKS
     @PostMapping("/faculty/decline-consultation")
     public String declineConsultation(
             @RequestParam("consultationId") Long consultationId,
@@ -381,6 +392,8 @@ public class PageController {
             }
             consultationRepository.save(consultation);
 
+            sendStatusUpdateEmailToStudent(consultation);
+
             redirectAttributes.addFlashAttribute("successMessage", "Consultation request declined.");
         } else {
             redirectAttributes.addFlashAttribute("errorMessage", "Request not found.");
@@ -389,7 +402,6 @@ public class PageController {
         return "redirect:/faculty/dashboard?success=declined";
     }
 
-    // 📝 FACULTY: GENERIC UPDATE CONSULTATION REQUEST STATUS & REMARKS
     @PostMapping("/faculty/update-request-status")
     public String updateRequestStatus(
             @RequestParam("consultationId") Long consultationId,
@@ -404,6 +416,9 @@ public class PageController {
                 consultation.setRemarks(remarks);
             }
             consultationRepository.save(consultation);
+
+            sendStatusUpdateEmailToStudent(consultation);
+
             redirectAttributes.addFlashAttribute("successMessage", "Consultation request status updated!");
         } else {
             redirectAttributes.addFlashAttribute("errorMessage", "Request not found.");
@@ -412,7 +427,6 @@ public class PageController {
         return "redirect:/faculty/dashboard?success=statusUpdated";
     }
 
-    // 📅 FACULTY: ADD SCHEDULE SLOT
     @PostMapping("/faculty/add-schedule")
     public String addFacultySchedule(
             @RequestParam("dayOfWeek") String dayOfWeek,
@@ -433,7 +447,6 @@ public class PageController {
         return "redirect:/faculty/dashboard?success=scheduleAdded";
     }
 
-    // 🗑️ FACULTY: DELETE SCHEDULE SLOT
     @PostMapping("/faculty/delete-schedule")
     public String deleteFacultySchedule(
             @RequestParam("scheduleId") Long scheduleId,
@@ -447,7 +460,6 @@ public class PageController {
         return "redirect:/faculty/dashboard?success=scheduleDeleted";
     }
 
-    // 🎓 DYNAMIC STUDENT DASHBOARD
     @GetMapping("/student/dashboard")
     public String showDashboard(
             @RequestParam(value = "dept", required = false) String dept,
@@ -475,8 +487,6 @@ public class PageController {
         }
 
         List<User> facultyList = userRepository.filterFaculty(dept, search);
-        
-        // 🛠️ GET DYNAMIC SUBJECTS BASED ON STUDENT COURSE
         List<Map<String, String>> availableSubjects = getSubjectsByCourse(loggedInUser.getCourse());
 
         List<Consultation> consultations = consultationRepository.findByUserOrderByIdDesc(loggedInUser);
@@ -510,7 +520,7 @@ public class PageController {
         return "student-dashboard";
     }
 
-    // 📮 BOOK CONSULTATION WITH DOUBLE-BOOKING PREVENTION, FILE ATTACHMENT & TEACHER EMAIL ALERT
+    // 📮 BOOK CONSULTATION WITH FILE ATTACHMENT, TEACHER NOTIFICATION & STUDENT SUBMISSION CONFIRMATION
     @PostMapping("/book-consultation")
     public String bookConsultation(
             @RequestParam("targetHead") String targetHead,
@@ -566,7 +576,7 @@ public class PageController {
 
             consultationRepository.save(consultation);
 
-            // 🟢 FIND TEACHER EMAIL AND SEND NOTIFICATION
+            // 1️⃣ Send Email Notification to Teacher
             try {
                 String teacherEmail = null;
                 List<User> allUsers = userRepository.findAll();
@@ -593,6 +603,22 @@ public class PageController {
                 System.err.println("⚠️ Warning: Could not send email notification to teacher: " + mailEx.getMessage());
             }
 
+            // 2️⃣ NEW: Send Submission Confirmation Email to Student
+            try {
+                if (loggedInUser.getEmail() != null) {
+                    emailService.sendConsultationSubmittedEmail(
+                        loggedInUser.getEmail(),
+                        loggedInUser.getFullName(),
+                        targetHead,
+                        preferredDate,
+                        preferredTime,
+                        purpose
+                    );
+                }
+            } catch (Exception studentMailEx) {
+                System.err.println("⚠️ Warning: Could not send submission confirmation email to student: " + studentMailEx.getMessage());
+            }
+
             redirectAttributes.addFlashAttribute("successMessage", "Consultation request submitted successfully!");
             return "redirect:/student/dashboard?success=booked";
         } catch (Exception e) {
@@ -602,7 +628,6 @@ public class PageController {
         }
     }
 
-    // 🚫 STUDENT CANCEL CONSULTATION REQUEST
     @PostMapping("/student/cancel-consultation")
     public String cancelConsultation(
             @RequestParam("consultationId") Long consultationId,
@@ -663,7 +688,27 @@ public class PageController {
         return "redirect:/student/dashboard?success=profileUpdated";
     }
 
-    // 🩺 HELPER METHOD: DYNAMICALLY MAP SUBJECTS BASED ON STUDENT COURSE
+    private void sendStatusUpdateEmailToStudent(Consultation consultation) {
+        try {
+            if (consultation != null && consultation.getUser() != null) {
+                User student = consultation.getUser();
+                if (student.getEmail() != null) {
+                    emailService.sendConsultationStatusUpdateEmail(
+                        student.getEmail(),
+                        student.getFullName(),
+                        consultation.getTargetHead(),
+                        consultation.getStatus(),
+                        consultation.getPreferredDate(),
+                        consultation.getPreferredTime(),
+                        consultation.getRemarks()
+                    );
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("⚠️ Warning: Could not send status update email to student: " + e.getMessage());
+        }
+    }
+
     private List<Map<String, String>> getSubjectsByCourse(String course) {
         List<Map<String, String>> list = new ArrayList<>();
         if (course == null) return list;
@@ -676,7 +721,6 @@ public class PageController {
             list.add(createSubjectMap("GEN 003", "SCIENCE TECHNOLOGY AND SOCIETY", "Mark Joshua Bodoy Vidar"));
             list.add(createSubjectMap("HIS 007", "LIFE AND WORKS OF RIZAL", "Henry James Herrera Bautista"));
         } else {
-            // Default / IT Subjects fallback
             list.add(createSubjectMap("ITE 300", "OBJECT ORIENTED PROGRAMMING", "Angel Mae Sevilla Galario"));
             list.add(createSubjectMap("ITE 298", "INFORMATION MANAGEMENT", "Angelo Jeric Balatbag Trias"));
             list.add(createSubjectMap("ITE 292", "NETWORKING 1", "Sigfried Fajardo Breton"));

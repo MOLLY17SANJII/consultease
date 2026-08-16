@@ -33,34 +33,23 @@
 
         .otp-card {
             background: var(--glass-bg); backdrop-filter: blur(16px);
-            padding: 40px 30px; border-radius: 20px; border: 1px solid var(--card-border);
+            padding: 35px 30px; border-radius: 20px; border: 1px solid var(--card-border);
             box-shadow: 0 20px 50px rgba(0,0,0,0.6); width: 100%; max-width: 440px; text-align: center;
         }
 
-        /* 🌟 Circular Gold-Glow Badge Style for Logo */
         .consult-logo-circle {
-            width: 80px;
-            height: 80px;
-            background-color: #ffffff;
-            border: 3.5px solid #f1b217;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 10px;
-            margin: 0 auto 12px auto;
+            width: 75px; height: 75px; background-color: #ffffff;
+            border: 3.5px solid #f1b217; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            padding: 10px; margin: 0 auto 12px auto;
             box-shadow: 0 0 15px rgba(241, 178, 23, 0.6);
         }
 
-        .consult-logo-circle img {
-            max-width: 100%;
-            max-height: 100%;
-            object-fit: contain;
-        }
+        .consult-logo-circle img { max-width: 100%; max-height: 100%; object-fit: contain; }
 
         .otp-input {
             width: 100%; padding: 14px; border-radius: 30px; border: 1px solid rgba(255,255,255,0.8);
-            font-size: 22px; text-align: center; letter-spacing: 8px; font-weight: 800; outline: none; margin: 20px 0;
+            font-size: 22px; text-align: center; letter-spacing: 8px; font-weight: 800; outline: none; margin: 15px 0;
             color: #222;
         }
 
@@ -68,13 +57,27 @@
             background: linear-gradient(135deg, #f5c747 0%, var(--accent-gold) 100%);
             color: var(--primary-green); font-weight: 800; border: none; width: 100%;
             padding: 14px; border-radius: 30px; font-size: 16px; cursor: pointer;
-            transition: transform 0.2s;
+            transition: transform 0.2s; margin-bottom: 15px;
         }
         .btn-submit:hover { transform: translateY(-1px); }
+
+        /* Spam notice box */
+        .spam-alert {
+            background: rgba(226, 171, 34, 0.15); border: 1px dashed var(--accent-gold);
+            padding: 10px 12px; border-radius: 10px; font-size: 12px; color: #fef08a;
+            margin-bottom: 15px; text-align: left; display: flex; align-items: flex-start; gap: 8px;
+        }
+        .spam-alert i { font-size: 14px; margin-top: 2px; color: var(--accent-gold); }
+
+        /* Resend section */
+        .resend-container { font-size: 13px; color: var(--text-muted); margin-top: 10px; }
+        .resend-container a { color: var(--accent-gold); text-decoration: none; font-weight: 700; }
+        .resend-container a.disabled { color: #6b7280; pointer-events: none; cursor: not-allowed; }
 
         #toast-container { position: fixed; top: 20px; right: 20px; z-index: 99999; display: flex; flex-direction: column; gap: 12px; }
         .toast-msg { min-width: 280px; padding: 14px 18px; border-radius: 12px; color: #ffffff; font-size: 13.5px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 10px 25px rgba(0,0,0,0.45); }
         .toast-msg.error { background: rgba(200, 35, 51, 0.95); }
+        .toast-msg.success { background: rgba(14, 61, 41, 0.95); border: 1px solid var(--accent-gold); }
     </style>
 </head>
 <body>
@@ -87,28 +90,45 @@
     <div id="toast-container"></div>
 
     <div class="otp-card">
-        <!-- Logo Wrapper with White Circle & Gold Glow -->
         <div class="consult-logo-circle">
             <img th:src="@{/images/logo.png}" src="/images/logo.png" alt="ConsultEase Logo">
         </div>
 
         <h2>Verify OTP</h2>
-        <p style="font-size: 12px; color: var(--text-muted);">An OTP code was sent to your school email.</p>
+        <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 15px;">
+            An OTP code was sent to your school email.
+        </p>
+
+        <!-- 🟡 Check Spam Folder Reminder Box -->
+        <div class="spam-alert">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+            <div>
+                <strong>Can't find the email?</strong> Please check your <strong>Spam</strong> or <strong>Junk</strong> folder, as automated emails sometimes land there.
+            </div>
+        </div>
 
         <form th:action="@{/otp-verify}" method="post">
             <input type="text" name="otp" class="otp-input" placeholder="••••••" maxlength="6" required autocomplete="off">
             <button type="submit" class="btn-submit">VERIFY & COMPLETE</button>
         </form>
+
+        <!-- ⏳ Resend OTP with Countdown Timer -->
+        <div class="resend-container">
+            Didn't receive the code? 
+            <span id="countdown-text">Resend in <strong id="timer">60</strong>s</span>
+            <a href="/otp-resend" id="resend-btn" style="display: none;">Resend OTP</a>
+        </div>
     </div>
 
     <script th:inline="javascript">
-        function showToast(message) {
+        function showToast(message, type = 'error') {
             const container = document.getElementById('toast-container');
             const toast = document.createElement('div');
-            toast.className = 'toast-msg error';
+            toast.className = `toast-msg ${type}`;
+            const icon = type === 'success' ? 'fa-circle-check' : 'fa-circle-exclamation';
             toast.innerHTML = `
                 <div style="display:flex;align-items:center;gap:10px;">
-                    <i class="fa-solid fa-circle-exclamation"></i>
+                    <i class="fa-solid ${icon}"></i>
                     <span>${message}</span>
                 </div>
                 <i class="fa-solid fa-xmark" style="cursor:pointer" onclick="this.parentElement.remove()"></i>
@@ -117,9 +137,27 @@
             setTimeout(() => { if (toast) toast.remove(); }, 5000);
         }
 
+        // ⏱️ Countdown Timer Logic (60 seconds)
+        let timeLeft = 60;
+        const timerElement = document.getElementById('timer');
+        const countdownText = document.getElementById('countdown-text');
+        const resendBtn = document.getElementById('resend-btn');
+
+        const countdownInterval = setInterval(() => {
+            timeLeft--;
+            timerElement.textContent = timeLeft;
+            if (timeLeft <= 0) {
+                clearInterval(countdownInterval);
+                countdownText.style.display = 'none';
+                resendBtn.style.display = 'inline-block';
+            }
+        }, 1000);
+
         document.addEventListener('DOMContentLoaded', function() {
             const errorMessage = /*[[${errorMessage}]]*/ null;
-            if (errorMessage) showToast(errorMessage);
+            const successMessage = /*[[${successMessage}]]*/ null;
+            if (errorMessage) showToast(errorMessage, 'error');
+            if (successMessage) showToast(successMessage, 'success');
         });
     </script>
 </body>
